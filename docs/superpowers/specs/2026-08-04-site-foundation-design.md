@@ -57,15 +57,16 @@ This pairing was chosen after two rounds of more conventional Google Fonts pairi
 
 ## Information Architecture
 
-Five pages, one persistent shell (nav plus footer, no eyebrow-style branding chrome):
+REVISED 2026-08-04 (client pivot): the site is now a one-page landing plus a separate Gallery page. Standalone About/Agenda/Get Involved routes are deferred until the client requests them.
 
 | Route | Purpose | Source content |
 |---|---|---|
-| `/` (Home) | Landing and funnel page: high-impact intro plus teasers into Agenda, About, Gallery, closing call to action into Get Involved. No page owns duplicate copy; Home only excerpts and links. | Welcome section of `docs/campaign-content.md` |
-| `/about` | Candidate pedigree, education, character. | "What Pedigree Do You Have" section |
-| `/agenda` | Legislative agenda: state police legislation, residency-over-origin constitutional change, secular-state amendment, six-zone restructuring, plus constituency development pledges. Longest, most structured page. | "When You Get There" and "Constituency Benefits" sections |
-| `/gallery` | Displays campaign images and videos. Built against a data interface with seed content now; wired to real uploads once the admin spec ships. | New, no docx source |
-| `/get-involved` | What is asked of supporters (vote, talk to others, volunteer, vote targets), informational only, outbound links to social/WhatsApp. No data-collecting form in this spec. | "What Do We Expect From You" section |
+| `/` (Home) | The full one-page site: hero and welcome, who OTO is (pedigree, education, character), the complete legislative agenda and constituency pledges, and the get-involved ask, as scrollable sections with anchor ids (`#about`, `#agenda`, `#get-involved`). Carries all necessary information itself; nothing is teased out to other pages except the Gallery. | All sections of `docs/campaign-content.md` |
+| `/gallery` | Displays campaign images and videos. Built against a data interface returning `[]` for now (no placeholder media); wired to real uploads once the admin spec ships. | New, no docx source |
+
+**Nav (revised):** wordmark plus anchor links to the landing page sections (About, Agenda, Get Involved as `/#about`, `/#agenda`, `/#get-involved`, so they also work from the Gallery page) and a Gallery link to its own route. Mobile keeps the full-screen overlay pattern.
+
+**Candidate imagery (new):** the client will supply 5 to 6 photos of the candidate. The one-page design must weave real image slots into the composition now, via a component that takes an optional `src` and renders a flat brand-color plane when the photo is not yet available (keeping the no-placeholder/no-stock rule). When the files arrive they drop into the existing slots without layout changes.
 
 ## Component Architecture
 

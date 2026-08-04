@@ -2029,3 +2029,30 @@ Stop the dev server afterward.
 If Steps 1 through 5 required any fixes, stage and commit them individually per the convention used in earlier tasks. If everything already passed, there is nothing to commit for this task.
 
 ---
+
+## REVISION 2026-08-04: One-Page Pivot
+
+Client direction after reviewing the first homepage build: the site becomes a one-page landing plus the separate Gallery route. Tasks 13, 14, and 15 are CANCELLED as standalone routes; their content moves into the landing page. Task 16's verification steps that reference `/about`, `/agenda`, `/get-involved` as routes now apply to the same-named sections of `/` instead. The client will supply 5 to 6 photos of the candidate; the design must include image slots now that render as flat brand planes until the files arrive.
+
+## Task 17: One-Page Home Rebuild
+
+Supersedes Tasks 13, 14, 15. Design-sensitive task: run on the most capable model with the elevated-design mandate used for Task 12; the implementer has license over composition within the locked design rules. The homepage's existing hero treatment (poster plane, gold pick-out, ledger rows, diagonal cuts) is the visual language to extend, not replace.
+
+**Files:**
+- Create: `content/about.ts`, `content/agenda.ts`, `content/get-involved.ts` (typed content drawn faithfully from `docs/campaign-content.md`; keep them as separate files so future standalone pages can reuse them)
+- Modify: `content/home.ts` (hero copy stays; teaser structure may change or go)
+- Create: `components/primitives/CampaignImage.tsx` + test (optional `src`, required `alt`, renders a flat brand-color plane when `src` is absent; next/image when present; no stock/placeholder imagery ever)
+- Create/modify section components as the design needs (e.g. PedigreeBlock, AgendaItem list, GetInvolvedList), composed from primitives
+- Modify: `app/page.tsx` (the full one-page composition with section ids `about`, `agenda`, `get-involved`), `app/page.test.tsx`
+- Modify: `components/layout/Nav.tsx` + test (links become `/#about`, `/#agenda`, `/#get-involved`, plus `/gallery`; active-link styling by pathname no longer applies to anchor links, adjust sensibly; mobile overlay pattern stays)
+- Footer links: update to match the new IA (`/#...` anchors plus `/gallery`)
+
+**Binding contract:**
+- Section ids exactly `about`, `agenda`, `get-involved` on the landing page.
+- All factual campaign content (names, degrees, party, vote targets, agenda specifics) faithful to `docs/campaign-content.md`; section intro copy may be crafted (striking, per design rule 8) but facts are locked.
+- At least 5 CampaignImage slots woven into the page composition.
+- Tests: Nav test asserts the four links' hrefs; page test asserts the h1, the three section ids exist, and one distinctive content assertion per section. Full suite green.
+- All global constraints from this plan's Global Constraints section still bind (tokens only, no em dashes, no eyebrows, per-breakpoint restructuring where it helps, Server Components for the page, no co-author trailers in commits per the client rule added 2026-08-04).
+- Client sign-off gate: the task is NOT complete when tests pass; it is complete when the client has seen the rendered page and approved it.
+
+---
