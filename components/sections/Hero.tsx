@@ -20,7 +20,11 @@ export function Hero({ headline, intro }: HeroProps) {
 
   return (
     <div className="flex min-h-[46svh] flex-col justify-end sm:min-h-[52svh] lg:min-h-[60svh]">
-      <Heading level={1} className="max-w-4xl text-6xl sm:text-7xl lg:max-w-5xl lg:text-8xl">
+      <Heading
+        level={1}
+        sizeOverride="text-6xl sm:text-7xl lg:text-8xl leading-[0.95] tracking-tight"
+        className="max-w-4xl lg:max-w-5xl"
+      >
         {lead ? (
           <>
             {lead} <span className="text-brand-gold">{emphasis}</span>

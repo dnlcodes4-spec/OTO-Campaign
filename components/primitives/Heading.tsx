@@ -6,6 +6,13 @@ type HeadingProps = {
   level: HeadingLevel;
   children: ReactNode;
   className?: string;
+  /*
+   * When provided, replaces the level's default size/leading/tracking classes
+   * entirely (the level still controls the semantic tag). This avoids stacking
+   * conflicting same-property utilities, whose winner would otherwise depend on
+   * Tailwind's emission order. Use className only for non-conflicting additions.
+   */
+  sizeOverride?: string;
 };
 
 const LEVEL_TAG: Record<HeadingLevel, ElementType> = {
@@ -22,10 +29,11 @@ const LEVEL_STYLES: Record<HeadingLevel, string> = {
   4: "text-xl sm:text-2xl leading-tight",
 };
 
-export function Heading({ level, children, className = "" }: HeadingProps) {
+export function Heading({ level, children, className = "", sizeOverride }: HeadingProps) {
   const Tag = LEVEL_TAG[level];
+  const sizeClasses = sizeOverride ?? LEVEL_STYLES[level];
   return (
-    <Tag className={`font-display font-semibold ${LEVEL_STYLES[level]} ${className}`}>
+    <Tag className={`font-display font-semibold ${sizeClasses} ${className}`}>
       {children}
     </Tag>
   );
