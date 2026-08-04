@@ -5,11 +5,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
-  { href: "/about", label: "About" },
-  { href: "/agenda", label: "Agenda" },
+  { href: "/#about", label: "About" },
+  { href: "/#agenda", label: "Agenda" },
+  { href: "/#get-involved", label: "Get Involved" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/get-involved", label: "Get Involved" },
 ];
+
+/*
+ * The section links are anchors into the one-page home, so pathname equality
+ * only means anything for real routes like the gallery. Anchor links never
+ * take the active color.
+ */
+function isActive(pathname: string, href: string) {
+  return !href.includes("#") && pathname === href;
+}
 
 export function Nav() {
   const [open, setOpen] = useState(false);
@@ -32,7 +41,9 @@ export function Nav() {
               key={link.href}
               href={link.href}
               className={`font-body text-sm font-medium ${
-                pathname === link.href ? "text-brand-red" : "text-ink hover:text-brand-green"
+                isActive(pathname, link.href)
+                  ? "text-brand-red"
+                  : "text-ink hover:text-brand-green"
               }`}
             >
               {link.label}
@@ -61,7 +72,7 @@ export function Nav() {
               href={link.href}
               onClick={() => setOpen(false)}
               className={`font-display text-3xl font-semibold ${
-                pathname === link.href ? "text-brand-red" : "text-ink"
+                isActive(pathname, link.href) ? "text-brand-red" : "text-ink"
               }`}
             >
               {link.label}

@@ -12,7 +12,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${clashDisplay.variable} ${switzer.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${clashDisplay.variable} ${switzer.variable} h-full motion-safe:scroll-smooth`}
+    >
       <body className="flex min-h-full flex-col bg-surface font-body text-ink antialiased">
         <Nav />
         <main className="flex-1">{children}</main>

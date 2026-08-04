@@ -7,6 +7,17 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("Nav", () => {
+  test("links the one-page sections by anchor and the gallery by route", () => {
+    render(<Nav />);
+    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/#about");
+    expect(screen.getByRole("link", { name: "Agenda" })).toHaveAttribute("href", "/#agenda");
+    expect(screen.getByRole("link", { name: "Get Involved" })).toHaveAttribute(
+      "href",
+      "/#get-involved"
+    );
+    expect(screen.getByRole("link", { name: "Gallery" })).toHaveAttribute("href", "/gallery");
+  });
+
   test("mobile menu is closed by default and toggles open and closed", () => {
     render(<Nav />);
 

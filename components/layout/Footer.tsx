@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const LINKS = [
-  { href: "/about", label: "About" },
-  { href: "/agenda", label: "Agenda" },
+  { href: "/#about", label: "About" },
+  { href: "/#agenda", label: "Agenda" },
+  { href: "/#get-involved", label: "Get Involved" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/get-involved", label: "Get Involved" },
 ];
 
 export function Footer() {

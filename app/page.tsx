@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Section } from "@/components/primitives/Section";
 import { Hero } from "@/components/sections/Hero";
-import { TeaserCard } from "@/components/sections/TeaserCard";
-import { CTABand } from "@/components/sections/CTABand";
+import { PedigreeBlock } from "@/components/sections/PedigreeBlock";
+import { AgendaLedger } from "@/components/sections/AgendaLedger";
+import { PledgeGrid } from "@/components/sections/PledgeGrid";
+import { GetInvolvedBlock } from "@/components/sections/GetInvolvedBlock";
+import { VoteTargets } from "@/components/sections/VoteTargets";
 import { homeContent } from "@/content/home";
 
 export const metadata: Metadata = {
@@ -11,34 +14,60 @@ export const metadata: Metadata = {
     "Oluwasegun Theophilus Oladimeji, Zenith Labour Party candidate for the Oyo South Senatorial District.",
 };
 
+type PlaneTone = "surface" | "green" | "ink";
+
+const PLANE_BG: Record<PlaneTone, string> = {
+  surface: "bg-surface",
+  green: "bg-brand-green",
+  ink: "bg-brand-green-deep",
+};
+
 /*
- * Three flat planes: green, surface, deep green. They meet on parallel
- * diagonal cuts, the same device the campaign's printed material uses, so
- * the page reads as one poster rather than a stack of sections.
+ * The landing page is the whole site now: six flat planes meeting on
+ * parallel diagonal cuts, the device the campaign's printed material uses,
+ * so the scroll reads as one long poster rather than a stack of sections.
+ * Each cut is a strip painted in the outgoing plane's color with the
+ * incoming plane rising through it on the shared diagonal.
  */
+function PlaneCut({ from, to }: { from: PlaneTone; to: PlaneTone }) {
+  return (
+    <div aria-hidden="true" className={`relative -my-px h-12 w-full sm:h-16 lg:h-24 ${PLANE_BG[from]}`}>
+      <div
+        className={`absolute inset-0 ${PLANE_BG[to]} [clip-path:polygon(0_100%,100%_0,100%_100%)]`}
+      />
+    </div>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
       <Section tone="green">
-        <Hero headline={homeContent.headline} intro={homeContent.intro} />
+        <Hero
+          headline={homeContent.headline}
+          intro={homeContent.intro}
+          portraitAlt={homeContent.portraitAlt}
+        />
       </Section>
-      <div
-        aria-hidden="true"
-        className="-mt-px h-12 w-full bg-brand-green [clip-path:polygon(0_0,100%_0,0_100%)] sm:h-16 lg:h-24"
-      />
+      <PlaneCut from="green" to="surface" />
+      <Section id="about">
+        <PedigreeBlock />
+      </Section>
+      <PlaneCut from="surface" to="ink" />
+      <Section id="agenda" tone="ink">
+        <AgendaLedger />
+      </Section>
+      <PlaneCut from="ink" to="surface" />
       <Section>
-        <div className="border-b-2 border-ink">
-          {homeContent.teasers.map((teaser) => (
-            <TeaserCard key={teaser.href} {...teaser} />
-          ))}
-        </div>
+        <PledgeGrid />
       </Section>
-      <div
-        aria-hidden="true"
-        className="-mb-px h-12 w-full bg-brand-green-deep [clip-path:polygon(100%_0,100%_100%,0_100%)] sm:h-16 lg:h-24"
-      />
+      <PlaneCut from="surface" to="green" />
+      <Section id="get-involved" tone="green">
+        <GetInvolvedBlock />
+      </Section>
+      <PlaneCut from="green" to="ink" />
       <Section tone="ink">
-        <CTABand {...homeContent.closing} />
+        <VoteTargets />
       </Section>
     </>
   );
