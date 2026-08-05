@@ -22,6 +22,13 @@ export function Footer() {
             Oluwasegun Theophilus Oladimeji, Zenith Labour Party candidate for the Oyo South Senatorial District.
           </p>
         </div>
+        {/*
+         * Footer sits on bg-brand-green-deep throughout, so the gold ring
+         * stays: brand-gold measures 8.19:1 there, well clear of WCAG
+         * 1.4.11's 3:1 floor. A dark ring (ink or brand-green) would not
+         * work on this plane, so this is not the shared light/dark split
+         * Nav and Button use, only the dark half of it.
+         */}
         <nav className="flex flex-col gap-2 sm:items-end">
           {LINKS.map((link) => (
             <Link

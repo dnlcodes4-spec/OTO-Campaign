@@ -197,20 +197,38 @@ describe("Nav", () => {
     expect(document.activeElement).toBe(galleryLink);
   });
 
-  test("nav links and controls carry the branded focus-visible outline", () => {
+  test("light-plane header controls carry a dark, high-contrast focus-visible outline", () => {
     render(<Nav />);
+    // Header bar sits on bg-surface (#f7f8f9). brand-gold only reaches 1.69:1
+    // there, failing WCAG 1.4.11's 3:1 floor; brand-green reaches 7.05:1.
     expect(screen.getByRole("link", { name: "OTO" }).className).toContain(
+      "focus-visible:outline-brand-green"
+    );
+    expect(screen.getByRole("link", { name: "OTO" }).className).not.toContain(
       "focus-visible:outline-brand-gold"
     );
     expect(screen.getByRole("link", { name: "About" }).className).toContain(
-      "focus-visible:outline-brand-gold"
+      "focus-visible:outline-brand-green"
     );
     expect(screen.getByRole("button", { name: "Open menu" }).className).toContain(
+      "focus-visible:outline-brand-green"
+    );
+  });
+
+  test("dark-plane overlay controls keep the gold focus-visible outline", () => {
+    render(<Nav />);
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    const dialog = screen.getByRole("dialog", { name: "Site menu" });
+
+    // Overlay body sits on bg-brand-green (#0b622f); gold reaches 4.16:1 there,
+    // and 8.19:1 against the deep-green coda. Both clear the 3:1 floor.
+    expect(within(dialog).getByRole("link", { name: "OTO" }).className).toContain(
       "focus-visible:outline-brand-gold"
     );
-
-    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.getByRole("button", { name: "Close menu" }).className).toContain(
+      "focus-visible:outline-brand-gold"
+    );
+    expect(within(dialog).getByRole("link", { name: "Gallery" }).className).toContain(
       "focus-visible:outline-brand-gold"
     );
   });
