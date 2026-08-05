@@ -44,4 +44,29 @@ describe("GetInvolvedBlock", () => {
       expect.stringContaining("oto-suit-1.png")
     );
   });
+
+  test("owns the full-bleed poster section that carries the get-involved id", () => {
+    const { container } = render(<GetInvolvedBlock />);
+    expect(container.querySelector("section#get-involved")).not.toBeNull();
+  });
+
+  test("sets the vote targets as the poster backdrop with the lead and both labels", () => {
+    render(<GetInvolvedBlock />);
+    expect(screen.getByText(getInvolvedContent.targetsLead)).toBeInTheDocument();
+    for (const target of getInvolvedContent.targets) {
+      expect(screen.getByText(target.figure)).toBeInTheDocument();
+      expect(screen.getByText(target.label)).toBeInTheDocument();
+    }
+    expect(getInvolvedContent.targets.map((target) => target.figure)).toEqual([
+      "1,000,000",
+      "500,000",
+    ]);
+  });
+
+  test("closes the poster with the Nehemiah epigraph", () => {
+    render(<GetInvolvedBlock />);
+    expect(
+      screen.getByText(/seek the welfare of the children of Oyo South/)
+    ).toBeInTheDocument();
+  });
 });
