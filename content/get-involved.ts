@@ -9,9 +9,22 @@ export type VoteTarget = {
   label: string;
 };
 
+export type TurnoutStat = {
+  figure: string;
+  label: string;
+};
+
 export const getInvolvedContent = {
-  turnoutLead:
-    "Oyo State has about 4 million registered voters. Barely a third of them consistently show up.",
+  turnoutStats: [
+    {
+      figure: "4,000,000",
+      label: "registered voters in Oyo State, more or less.",
+    },
+    {
+      figure: "1 in 3",
+      label: "is all that consistently shows up.",
+    },
+  ] as TurnoutStat[],
   turnoutBody:
     "Three million people sit out every cycle: no confidence in the process, no appetite for a vote-buying charade, no faith it is worth their time. Under BVAS, INEC's Bimodal Voter Accreditation System, the brazen rigging is finished. Nobody thumbprints from a hotel room anymore, and every figure collated must tally with the count posted at the polling unit. This time the campaign will have adequate hands at the units to help guard the result, and even a wrong announcement is a lot easier to overturn at the tribunal. If citizens do their part at the polls, it never gets that far.",
   image: {
