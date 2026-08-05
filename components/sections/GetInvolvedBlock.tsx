@@ -1,124 +1,90 @@
-import { Container } from "@/components/primitives/Container";
 import { Heading } from "@/components/primitives/Heading";
 import { CampaignImage } from "@/components/primitives/CampaignImage";
 import { getInvolvedContent } from "@/content/get-involved";
 
 /*
- * The page's climax is one full-bleed deep-green poster plane, so this block
- * owns its own section element instead of taking the Section primitive: the
- * vote-target numerals need the whole viewport width to crop off the plane
- * edges the way poster type does, and the old separate vote-targets plane is
- * subsumed here so the count lands where the asking happens.
+ * The last question on the page turns back on the reader. The four asks run
+ * as a numbered ledger down the right, numbered because they escalate:
+ * decide, persuade, volunteer, commit.
  *
- * Reading order is the argument. The heading turns the page's question on
- * the reader, a quiet intro row states the turnout math and the BVAS case,
- * then the poster field answers with the commitment: the two numerals at
- * architectural scale in gold, the first bleeding off the left edge, the
- * second off the right, their labels small beneath them inside the measure.
- * The four asks run as a compact numbered strip in the right column, tight
- * and scannable under the count they serve, and the Nehemiah epigraph closes
- * beneath the strip. The grey-suit cut-out stands large across the bottom
- * left, in front of the type like a poster subject, mirroring the hero's
- * bottom right so the page opens and closes with the candidate. The plane
- * runs seamlessly into the same-color footer, so his crop line lands on the
- * page's last seam.
+ * The left column is one composed unit: a deep-green panel that spans the
+ * full column height, its top edge taking the page's diagonal, high on the
+ * right so its top corner meets the ledger's first rule across the gutter.
+ * The turnout story lives inside the panel, where the void used to be: the
+ * two figures at poster scale in gold, echoing the vote-target numerals on
+ * the plane below, their labels and the supporting paragraph in body type.
+ * The grey-suit cut-out anchors to the panel base at full panel width.
  *
- * Below lg the poster recomposes instead of scaling: numerals stack at
- * viewport scale, the strip and epigraph follow at full width, and the
- * portrait anchors the plane's base flush into the footer.
+ * The panel is the deep green of the incoming vote-targets plane and
+ * overruns the section by its bottom padding plus the cut-strip height
+ * (4+3rem, 5+4rem at sm, 7+6rem at lg), so it crosses the green-to-ink
+ * diagonal and dissolves into the plane below: the candidate stands on a
+ * tongue of the next plane rising through the cut, mirroring the hero at
+ * bottom right. On mobile the asks read first and the panel closes the
+ * section the same way.
  */
 export function GetInvolvedBlock() {
   return (
-    <section
-      id="get-involved"
-      className="relative -mb-px scroll-mt-16 overflow-hidden bg-brand-green-deep pt-16 text-ink-inverse sm:pt-20 lg:pt-28"
-    >
-      <Container>
-        <Heading
-          level={2}
-          sizeOverride="text-4xl sm:text-5xl lg:text-6xl leading-[0.98] tracking-tight"
-          className="max-w-3xl"
-        >
-          What do we expect <span className="text-brand-gold">from you?</span>
-        </Heading>
-        <div className="mt-8 grid gap-x-12 gap-y-8 lg:mt-12 lg:grid-cols-12">
-          <div className="flex flex-col gap-3 lg:col-span-5">
-            {getInvolvedContent.turnoutStats.map((stat) => (
-              <p
-                key={stat.figure}
-                className="font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg"
-              >
-                <span className="font-display text-2xl font-semibold tracking-tight text-brand-gold sm:text-3xl">
-                  {stat.figure}
-                </span>{" "}
-                <span>{stat.label}</span>
+    <div>
+      <Heading
+        level={2}
+        sizeOverride="text-4xl sm:text-5xl lg:text-6xl leading-[0.98] tracking-tight"
+        className="max-w-3xl"
+      >
+        What do we expect <span className="text-brand-gold">from you?</span>
+      </Heading>
+      <div className="mt-10 grid gap-x-12 gap-y-14 lg:mt-14 lg:grid-cols-12">
+        <ol className="lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:flex lg:flex-col lg:justify-between">
+          {getInvolvedContent.asks.map((ask) => (
+            <li
+              key={ask.number}
+              className="grid grid-cols-[auto_1fr] gap-x-6 border-t border-ink-inverse/20 py-6 sm:py-8 lg:gap-x-8 lg:py-10"
+            >
+              <p className="font-display text-3xl font-semibold leading-none text-brand-gold sm:text-4xl">
+                {ask.number}
               </p>
-            ))}
-          </div>
-          <p className="font-body text-base leading-relaxed text-ink-inverse/75 lg:col-span-7">
-            {getInvolvedContent.turnoutBody}
-          </p>
-        </div>
-      </Container>
-      <div className="relative mt-14 sm:mt-16 lg:mt-24">
-        <Container>
-          <p className="max-w-2xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg">
-            {getInvolvedContent.targetsLead}
-          </p>
-        </Container>
-        <div className="mt-6 lg:mt-8">
-          <p className="-ml-[2vw] whitespace-nowrap font-display text-[23vw] font-semibold leading-[0.82] tracking-tight text-brand-gold lg:-ml-[1vw] lg:text-[17vw]">
-            {getInvolvedContent.targets[0].figure}
-          </p>
-          <Container>
-            <p className="mt-2 max-w-md font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg">
-              {getInvolvedContent.targets[0].label}
-            </p>
-          </Container>
-          <p className="-mr-[4vw] mt-10 whitespace-nowrap text-right font-display text-[23vw] font-semibold leading-[0.82] tracking-tight text-brand-gold sm:mt-12 lg:-mr-[2vw] lg:-mt-[3vw] lg:text-[17vw]">
-            {getInvolvedContent.targets[1].figure}
-          </p>
-          <Container>
-            <p className="ml-auto mt-2 max-w-md text-right font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg">
-              {getInvolvedContent.targets[1].label}
-            </p>
-          </Container>
-        </div>
-        <Container className="relative z-10 mt-12 lg:mt-10 lg:pb-16">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
-            <ol className="border-b border-ink-inverse/20 lg:col-span-6 lg:col-start-7">
-              {getInvolvedContent.asks.map((ask) => (
-                <li
-                  key={ask.number}
-                  className="grid grid-cols-[auto_1fr] gap-x-4 border-t border-ink-inverse/20 py-4 sm:gap-x-5 sm:py-5"
-                >
-                  <p className="font-display text-lg font-semibold leading-tight text-brand-gold sm:text-xl">
-                    {ask.number}
+              <div>
+                <Heading level={3} sizeOverride="text-2xl sm:text-3xl leading-tight">
+                  {ask.title}
+                </Heading>
+                <p className="mt-2 max-w-xl font-body text-base leading-relaxed text-ink-inverse/75">
+                  {ask.detail}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <div className="relative z-5 -mb-28 flex flex-col sm:-mb-36 lg:col-span-6 lg:col-start-1 lg:row-start-1 lg:-mb-52">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-brand-green-deep [clip-path:polygon(0_2.5rem,100%_0,100%_100%,0_100%)] sm:[clip-path:polygon(0_3rem,100%_0,100%_100%,0_100%)] lg:[clip-path:polygon(0_2rem,100%_0,100%_100%,0_100%)]"
+          />
+          <div className="relative px-6 pb-10 pt-16 sm:px-8 sm:pt-20 lg:pt-16">
+            <div className="flex flex-col gap-8">
+              {getInvolvedContent.turnoutStats.map((stat) => (
+                <div key={stat.figure}>
+                  <p className="font-display text-5xl font-semibold leading-none tracking-tight text-brand-gold sm:text-6xl lg:text-7xl">
+                    {stat.figure}
                   </p>
-                  <div>
-                    <Heading level={3} sizeOverride="text-lg sm:text-xl leading-tight">
-                      {ask.title}
-                    </Heading>
-                    <p className="mt-1 font-body text-sm leading-relaxed text-ink-inverse/70 sm:text-base">
-                      {ask.detail}
-                    </p>
-                  </div>
-                </li>
+                  <p className="mt-3 font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg">
+                    {stat.label}
+                  </p>
+                </div>
               ))}
-            </ol>
-            <p className="mt-10 font-display text-lg font-medium leading-snug text-ink-inverse/60 sm:text-xl lg:col-span-6 lg:col-start-7 lg:mt-12 lg:text-2xl">
-              &ldquo;{getInvolvedContent.epigraph}&rdquo;
+            </div>
+            <p className="mt-8 border-t border-ink-inverse/20 pt-6 font-body text-base leading-relaxed text-ink-inverse/75">
+              {getInvolvedContent.turnoutBody}
             </p>
           </div>
-        </Container>
-        <CampaignImage
-          src={getInvolvedContent.image.src}
-          alt={getInvolvedContent.image.alt}
-          fit="cutout"
-          sizes="(min-width: 1024px) 62vw, 100vw"
-          className="relative z-10 mt-12 aspect-[1600/1235] w-full lg:absolute lg:bottom-0 lg:left-[-4vw] lg:mt-0 lg:w-[62vw]"
-        />
+          <CampaignImage
+            src={getInvolvedContent.image.src}
+            alt={getInvolvedContent.image.alt}
+            fit="cutout"
+            sizes="(min-width: 1152px) 504px, (min-width: 1024px) 48vw, 100vw"
+            className="relative mt-auto aspect-[1600/1235] w-full"
+          />
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

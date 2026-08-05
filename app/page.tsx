@@ -5,6 +5,7 @@ import { PedigreeBlock } from "@/components/sections/PedigreeBlock";
 import { AgendaLedger } from "@/components/sections/AgendaLedger";
 import { PledgeGrid } from "@/components/sections/PledgeGrid";
 import { GetInvolvedBlock } from "@/components/sections/GetInvolvedBlock";
+import { VoteTargets } from "@/components/sections/VoteTargets";
 import { homeContent } from "@/content/home";
 
 export const metadata: Metadata = {
@@ -22,14 +23,11 @@ const PLANE_BG: Record<PlaneTone, string> = {
 };
 
 /*
- * The landing page is the whole site now: five flat planes meeting on
+ * The landing page is the whole site now: six flat planes meeting on
  * parallel diagonal cuts, the device the campaign's printed material uses,
  * so the scroll reads as one long poster rather than a stack of sections.
  * Each cut is a strip painted in the outgoing plane's color with the
- * incoming plane rising through it on the shared diagonal. The last plane
- * is the get-involved poster, which renders its own full-bleed section so
- * the vote-target numerals can crop off the viewport edges, and it runs
- * seamlessly into the same-color footer.
+ * incoming plane rising through it on the shared diagonal.
  */
 function PlaneCut({ from, to }: { from: PlaneTone; to: PlaneTone }) {
   return (
@@ -63,8 +61,14 @@ export default function HomePage() {
       <Section>
         <PledgeGrid />
       </Section>
-      <PlaneCut from="surface" to="ink" />
-      <GetInvolvedBlock />
+      <PlaneCut from="surface" to="green" />
+      <Section id="get-involved" tone="green">
+        <GetInvolvedBlock />
+      </Section>
+      <PlaneCut from="green" to="ink" />
+      <Section tone="ink">
+        <VoteTargets />
+      </Section>
     </>
   );
 }

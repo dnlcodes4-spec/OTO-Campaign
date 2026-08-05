@@ -66,14 +66,11 @@ describe("Home page", () => {
     );
   });
 
-  test("get involved carries the asks, the vote targets, and the epigraph on one plane", () => {
+  test("get involved carries the asks and the vote targets", () => {
     const { container } = render(<HomePage />);
     const getInvolved = getSection(container, "get-involved");
     expect(within(getInvolved).getByText(/at least ten more/)).toBeInTheDocument();
-    expect(within(getInvolved).getByText("1,000,000")).toBeInTheDocument();
-    expect(within(getInvolved).getByText("500,000")).toBeInTheDocument();
-    expect(
-      within(getInvolved).getByText(/seek the welfare of the children of Oyo South/)
-    ).toBeInTheDocument();
+    expect(screen.getByText("1,000,000")).toBeInTheDocument();
+    expect(screen.getByText("500,000")).toBeInTheDocument();
   });
 });
