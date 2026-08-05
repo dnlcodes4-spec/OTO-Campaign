@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { siteContent } from "@/content/site";
 
 const LINKS = [
   { href: "/#about", label: "About" },
@@ -10,6 +12,33 @@ const LINKS = [
   { href: "/#get-involved", label: "Get Involved" },
   { href: "/gallery", label: "Gallery" },
 ];
+
+/*
+ * Branded focus-visible treatment, split by the plane each control sits on.
+ * A single gold ring cannot serve both: brand-gold measures only 1.69:1
+ * against the light header bar (bg-surface, #f7f8f9), well under WCAG
+ * 1.4.11's 3:1 floor for non-text indicators, while a dark ring measures
+ * only 1.91:1 / 1.03:1 against the overlay's green / deep-green planes.
+ *
+ * Light plane (header bar, bg-surface): brand-green measures 7.05:1, so the
+ * header wordmark, desktop nav links, and hamburger button use it.
+ *
+ * Dark planes (mobile overlay body on bg-brand-green, coda on
+ * bg-brand-green-deep): brand-gold measures 4.16:1 and 8.19:1 there, so the
+ * overlay wordmark, close control, and overlay nav links keep gold.
+ *
+ * Both deliberately skip outline-none/outline-hidden: those set Tailwind's
+ * shared --tw-outline-style variable to "none" unconditionally, and
+ * focus-visible:outline-2 reads that same variable, so the two would cancel
+ * out and the ring would never render. outline-style is already "none" at
+ * rest (the CSS initial value), so nothing needs suppressing there.
+ */
+const FOCUS_RING_LIGHT_PLANE =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green";
+const FOCUS_RING_DARK_PLANE =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold";
+
+const FOCUSABLE_SELECTOR = "a[href], button:not([disabled])";
 
 /*
  * The section links are anchors into the one-page home, so pathname equality
@@ -39,6 +68,7 @@ export function Nav() {
   const pathname = usePathname();
   const openButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const wasOpen = useRef(false);
 
   useEffect(() => {
@@ -51,6 +81,33 @@ export function Nav() {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  /*
+   * Nav renders only the header; the landmarks it needs to inert live in
+   * app/layout.tsx as siblings it does not own. There is exactly one <main>
+   * and one <footer> on every route, so a plain landmark-tag query from this
+   * effect is the whole mechanism: no id plumbing or ref drilling across the
+   * server/client boundary for a layout that never varies. The attribute
+   * (not the React 19 `inert` prop, which Nav has no element to hold) is
+   * removed in the same cleanup path that already runs on close, on the
+   * breakpoint auto-close, and on unmount, so the page is never left inert.
+   *
+   * Real inert support (mouse, assistive-tech linearization) is defense in
+   * depth here; the keydown trap below is what actually contains keyboard
+   * focus, since jsdom does not implement inert's focus-blocking behavior
+   * and the trap needs to work under test regardless of browser support.
+   */
+  useEffect(() => {
+    if (!open) return;
+    const main = document.querySelector("main");
+    const footer = document.querySelector("footer");
+    main?.setAttribute("inert", "");
+    footer?.setAttribute("inert", "");
+    return () => {
+      main?.removeAttribute("inert");
+      footer?.removeAttribute("inert");
     };
   }, [open]);
 
@@ -81,11 +138,45 @@ export function Nav() {
     return () => query.removeEventListener("change", onChange);
   }, []);
 
+  /*
+   * Explicit keydown trap rather than relying on inert alone: jsdom does not
+   * implement inert's focus-blocking, so this is what the wrap-around tests
+   * exercise directly, and it is also what actually keeps Tab/Shift+Tab
+   * inside the dialog in real browsers regardless of inert support.
+   */
+  function trapFocus(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "Tab") return;
+    const container = menuRef.current;
+    if (!container) return;
+    const focusable = Array.from(
+      container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   return (
     <header className="sticky top-0 z-50">
       <div className="border-b border-ink/10 bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 sm:px-8 lg:px-12">
-          <Link href="/" className="font-display text-xl font-semibold text-ink">
+          {/*
+           * Type-first identity: the wordmark carries the name, the round
+           * mark rides beside it at cap height with an empty alt so the
+           * link still reads as plain "OTO".
+           */}
+          <Link
+            href="/"
+            className={`flex items-center gap-2.5 font-display text-xl font-semibold text-ink ${FOCUS_RING_LIGHT_PLANE}`}
+          >
+            <Image src={siteContent.logo.src} alt={siteContent.logo.alt} width={26} height={26} />
             OTO
           </Link>
 
@@ -94,7 +185,7 @@ export function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`font-body text-sm font-medium ${
+                className={`font-body text-sm font-medium ${FOCUS_RING_LIGHT_PLANE} ${
                   isActive(pathname, link.href)
                     ? "text-brand-red"
                     : "text-ink hover:text-brand-green"
@@ -108,7 +199,7 @@ export function Nav() {
           <button
             ref={openButtonRef}
             type="button"
-            className="flex flex-col gap-1.5 lg:hidden"
+            className={`flex flex-col gap-1.5 lg:hidden ${FOCUS_RING_LIGHT_PLANE}`}
             aria-label="Open menu"
             aria-expanded={open}
             {...(open ? { "aria-controls": "mobile-menu" } : {})}
@@ -124,13 +215,18 @@ export function Nav() {
       {open && (
         <div
           id="mobile-menu"
+          ref={menuRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site menu"
+          onKeyDown={trapFocus}
           className="fixed inset-0 z-50 flex flex-col bg-brand-green motion-safe:animate-menu-plane lg:hidden"
         >
           <div className="flex items-center justify-between px-6 py-4 sm:px-8">
             <Link
               href="/"
               onClick={() => setOpen(false)}
-              className="font-display text-xl font-semibold text-ink-inverse"
+              className={`font-display text-xl font-semibold text-ink-inverse ${FOCUS_RING_DARK_PLANE}`}
             >
               OTO
             </Link>
@@ -139,7 +235,7 @@ export function Nav() {
               type="button"
               aria-label="Close menu"
               onClick={() => setOpen(false)}
-              className="relative flex h-6 w-6 items-center justify-center"
+              className={`relative flex h-6 w-6 items-center justify-center ${FOCUS_RING_DARK_PLANE}`}
             >
               <span className="absolute h-0.5 w-6 rotate-45 bg-ink-inverse" />
               <span className="absolute h-0.5 w-6 -rotate-45 bg-ink-inverse" />
@@ -153,7 +249,7 @@ export function Nav() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className={`block border-t border-ink-inverse/15 py-4 font-display text-4xl font-semibold leading-none tracking-tight transition-colors active:text-brand-gold sm:py-5 sm:text-5xl ${
+                  className={`block border-t border-ink-inverse/15 py-4 font-display text-4xl font-semibold leading-none tracking-tight transition-colors active:text-brand-gold sm:py-5 sm:text-5xl ${FOCUS_RING_DARK_PLANE} ${
                     isActive(pathname, link.href) ? "text-brand-gold" : "text-ink-inverse"
                   }`}
                 >

@@ -14,4 +14,18 @@ describe("Footer", () => {
     );
     expect(screen.getByRole("link", { name: "Gallery" })).toHaveAttribute("href", "/gallery");
   });
+
+  test("carries the logo mark as a decorative support to the wordmark", () => {
+    const { container } = render(<Footer />);
+    const mark = container.querySelector('img[src*="oto-logo"]');
+    expect(mark).not.toBeNull();
+    expect(mark).toHaveAttribute("alt", "");
+  });
+
+  test("nav links carry the branded focus-visible outline", () => {
+    render(<Footer />);
+    expect(screen.getByRole("link", { name: "About" }).className).toContain(
+      "focus-visible:outline-brand-gold"
+    );
+  });
 });

@@ -14,7 +14,10 @@ export const getInvolvedContent = {
     "Oyo State has about 4 million registered voters. Barely a third of them consistently show up.",
   turnoutBody:
     "Three million people sit out every cycle: no confidence in the process, no appetite for a vote-buying charade, no faith it is worth their time. Under BVAS, INEC's Bimodal Voter Accreditation System, the brazen rigging is finished. Nobody thumbprints from a hotel room anymore, and every figure collated must tally with the count posted at the polling unit. This time the campaign will have adequate hands at the units to help guard the result, and even a wrong announcement is a lot easier to overturn at the tribunal. If citizens do their part at the polls, it never gets that far.",
-  imageAlt: "OTO with supporters on the campaign trail",
+  image: {
+    src: "/images/oto-suit-1.png",
+    alt: "OTO in a grey suit, facing the voters he is asking to show up",
+  },
   asks: [
     {
       number: "1",

@@ -7,12 +7,19 @@ import { aboutContent } from "@/content/about";
  * district should be asking anyone who wants its seat. Two of them live here.
  * The first gets a one-line answer set at display scale; the second gets the
  * full ledger: the name with its three initials picked out in green (that is
- * where OTO comes from), the character copy beside the portrait slot, the
+ * where OTO comes from), the character copy beside the portrait, the
  * education rows, and the candidate's answer-quote on a flat red plane, the
  * only red plane on the page.
+ *
+ * The portrait is an alpha cut-out composed against its own green plane. The
+ * plane's top edge takes the page's diagonal, high on the right like every
+ * cut on the site, and the head breaks through it while the shoulders crop
+ * flush with the plane's bottom edge. On desktop the whole composition
+ * bottom-anchors so its base lines up with the red quote plane across the
+ * gutter: green and red closing on the same baseline.
  */
 export function PedigreeBlock() {
-  const { nameParts } = aboutContent;
+  const { nameParts, portrait } = aboutContent;
 
   return (
     <div>
@@ -64,13 +71,20 @@ export function PedigreeBlock() {
               </p>
             </blockquote>
           </div>
-          <div className="lg:col-span-5">
-            <CampaignImage
-              alt="Portrait of OTO"
-              tone="green"
-              sizes="(min-width: 1024px) 40vw, 100vw"
-              className="aspect-[4/5] w-full sm:aspect-[16/10] lg:aspect-auto lg:h-full"
-            />
+          <div className="lg:col-span-5 lg:flex lg:h-full lg:flex-col lg:justify-end">
+            <div className="relative">
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-brand-green [clip-path:polygon(0_30%,100%_12%,100%_100%,0_100%)]"
+              />
+              <CampaignImage
+                src={portrait.src}
+                alt={portrait.alt}
+                fit="cutout"
+                sizes="(min-width: 1152px) 412px, (min-width: 1024px) 40vw, 100vw"
+                className="aspect-[1453/1600] w-full"
+              />
+            </div>
           </div>
         </div>
 

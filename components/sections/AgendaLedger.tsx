@@ -1,5 +1,11 @@
 import { Heading } from "@/components/primitives/Heading";
-import { CampaignImage } from "@/components/primitives/CampaignImage";
+import {
+  FederatingZones,
+  Residency,
+  SecularState,
+  StatePolice,
+  type PictogramProps,
+} from "@/components/graphics";
 import { agendaContent, type AgendaItem } from "@/content/agenda";
 
 /*
@@ -10,14 +16,33 @@ import { agendaContent, type AgendaItem } from "@/content/agenda";
  * then the working detail as hairline micro-rows. The state police item
  * carries its two routes side by side under gold rules, because the two-route
  * strategy is the point.
+ *
+ * Each item also carries a custom pictogram that states its policy idea in
+ * the site's plane-cut geometry. On desktop it sits under the gold numeral,
+ * so the left column reads as a spine: number, then idea. On mobile it takes
+ * the empty right half of the numeral line, balancing the row instead of
+ * squeezing between numeral and title.
  */
+const PICTOGRAMS: Record<string, (props: PictogramProps) => React.ReactNode> = {
+  "1": StatePolice,
+  "2": Residency,
+  "3": SecularState,
+  "4": FederatingZones,
+};
+
 function AgendaItemRow({ item }: { item: AgendaItem }) {
+  const Pictogram = PICTOGRAMS[item.number];
   return (
     <article className="border-t border-ink-inverse/20 py-10 sm:py-12 lg:py-16">
       <div className="grid gap-x-10 gap-y-4 lg:grid-cols-12">
-        <p className="font-display text-6xl font-semibold leading-none text-brand-gold sm:text-7xl lg:col-span-2 lg:text-8xl">
-          {item.number}
-        </p>
+        <div className="flex items-start justify-between gap-6 lg:col-span-2 lg:flex-col lg:justify-start lg:gap-12">
+          <p className="font-display text-6xl font-semibold leading-none text-brand-gold sm:text-7xl lg:text-8xl">
+            {item.number}
+          </p>
+          {Pictogram && (
+            <Pictogram className="h-16 w-16 shrink-0 text-ink-inverse/90 sm:h-20 sm:w-20 lg:h-24 lg:w-24" />
+          )}
+        </div>
         <div className="lg:col-span-10">
           <Heading level={3} sizeOverride="text-3xl sm:text-4xl leading-[1.02] tracking-tight">
             {item.title}
@@ -77,19 +102,9 @@ export function AgendaLedger() {
       >
         When you get there, what do you have in mind <span className="text-brand-gold">for us?</span>
       </Heading>
-      <div className="mt-8 grid gap-x-12 gap-y-10 lg:mt-12 lg:grid-cols-12 lg:items-end">
-        <p className="max-w-2xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg lg:col-span-7">
-          {agendaContent.intro}
-        </p>
-        <div className="lg:col-span-5">
-          <CampaignImage
-            alt={agendaContent.imageAlt}
-            tone="green"
-            sizes="(min-width: 1024px) 40vw, 100vw"
-            className="aspect-[16/10] w-full"
-          />
-        </div>
-      </div>
+      <p className="mt-8 max-w-2xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg lg:mt-12">
+        {agendaContent.intro}
+      </p>
       <div className="mt-12 lg:mt-16">
         {agendaContent.items.map((item) => (
           <AgendaItemRow key={item.number} item={item} />
