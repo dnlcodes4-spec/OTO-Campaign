@@ -1,26 +1,50 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --color-brand-green: #0b622f;
+  --color-brand-green-bright: #009846;
+  --color-brand-green-deep: #132d1f;
+  --color-brand-red: #e31e24;
+  --color-brand-red-pressed: #c92223;
+  --color-brand-gold: #f5b700;
+  --color-brand-gold-deep: #c9a227;
+  --color-surface: #f7f8f9;
+  --color-ink: #2b2a29;
+  --color-ink-inverse: #fefefe;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-display: var(--font-clash-display), sans-serif;
+  --font-body: var(--font-switzer), sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /*
+   * The mobile menu plane wipes in along the same diagonal the section cuts
+   * use (high on the right), then its content settles. Both run only under
+   * motion-safe.
+   */
+  --animate-menu-plane: menu-plane 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-menu-links: menu-links 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+
+  @keyframes menu-plane {
+    from {
+      clip-path: polygon(0 0, 100% 0, 100% -35%, 0 0%);
+    }
+    to {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 135%);
+    }
+  }
+
+  @keyframes menu-links {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-surface);
+  color: var(--color-ink);
 }
