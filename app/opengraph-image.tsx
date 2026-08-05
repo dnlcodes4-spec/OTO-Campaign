@@ -14,6 +14,16 @@ import { CANDIDATE_NAME, CANDIDATE_RACE } from "@/lib/site";
  * ImageResponse cannot parse; ttf/otf/woff only) - a bold system sans
  * keeps this legible at WhatsApp's thumbnail size without a network
  * fetch at build time.
+ *
+ * The logo is read inside the request handler (not at module scope) and
+ * passed as an ArrayBuffer rather than a base64 data URI: a module-scope
+ * top-level `await readFile` survived Turbopack's dev-mode module
+ * re-evaluation across edits/HMR passes with a stale reference, which
+ * only ever surfaced once next start served the build-time cached image
+ * and next dev kept re-invoking the (stale) render path per request.
+ * Reading fresh on every call and skipping the base64 round-trip removes
+ * both suspects at once; ImageResponse (Satori) accepts a raw buffer for
+ * <img src> even though that isn't part of the HTML spec.
  */
 export const alt = `${CANDIDATE_NAME}, ${CANDIDATE_RACE}`;
 export const size = {
@@ -22,17 +32,14 @@ export const size = {
 };
 export const contentType = "image/png";
 
-const logoData = await readFile(
-  join(process.cwd(), "public/images/oto-logo.png"),
-  "base64",
-);
-const logoSrc = `data:image/png;base64,${logoData}`;
-
 const BRAND_GREEN_DEEP = "#132d1f";
 const BRAND_GREEN_BRIGHT = "#009846";
 const BRAND_GOLD = "#f5b700";
 
-export default function Image() {
+export default async function Image() {
+  const logo = await readFile(join(process.cwd(), "public/images/oto-logo.png"));
+  const logoSrc = Uint8Array.from(logo).buffer;
+
   return new ImageResponse(
     (
       <div
@@ -70,6 +77,7 @@ export default function Image() {
           }}
         >
           <img
+            // @ts-expect-error Satori accepts ArrayBuffer/typed arrays for <img src> at runtime
             src={logoSrc}
             width={112}
             height={112}
