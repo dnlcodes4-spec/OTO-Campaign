@@ -14,6 +14,34 @@
 
   --font-display: var(--font-clash-display), sans-serif;
   --font-body: var(--font-switzer), sans-serif;
+
+  /*
+   * The mobile menu plane wipes in along the same diagonal the section cuts
+   * use (high on the right), then its content settles. Both run only under
+   * motion-safe.
+   */
+  --animate-menu-plane: menu-plane 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-menu-links: menu-links 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+
+  @keyframes menu-plane {
+    from {
+      clip-path: polygon(0 0, 100% 0, 100% -35%, 0 0%);
+    }
+    to {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 135%);
+    }
+  }
+
+  @keyframes menu-links {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 body {
