@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import HomePage from "./page";
+import { homeContent } from "@/content/home";
+import { aboutContent } from "@/content/about";
+import { getInvolvedContent } from "@/content/get-involved";
 
 function getSection(container: HTMLElement, id: string) {
   const section = container.querySelector(`#${id}`);
@@ -44,6 +47,23 @@ describe("Home page", () => {
     expect(
       within(agenda).getByRole("heading", { name: "Redraft the Civil Defence law" })
     ).toBeInTheDocument();
+  });
+
+  test("composes the three candidate portraits with their content-file alt text", () => {
+    render(<HomePage />);
+    expect(screen.getAllByRole("img")).toHaveLength(3);
+    expect(screen.getByAltText(homeContent.portrait.alt)).toHaveAttribute(
+      "src",
+      expect.stringContaining("oto-native.png")
+    );
+    expect(screen.getByAltText(aboutContent.portrait.alt)).toHaveAttribute(
+      "src",
+      expect.stringContaining("oto-suit-2.png")
+    );
+    expect(screen.getByAltText(getInvolvedContent.image.alt)).toHaveAttribute(
+      "src",
+      expect.stringContaining("oto-suit-1.png")
+    );
   });
 
   test("get involved carries the asks and the vote targets", () => {

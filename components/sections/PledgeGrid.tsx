@@ -1,14 +1,12 @@
 import { Heading } from "@/components/primitives/Heading";
-import { CampaignImage } from "@/components/primitives/CampaignImage";
 import { agendaContent } from "@/content/agenda";
 
 /*
  * The constituency pledges follow the legislative agenda as its close-to-home
  * half, back on the light plane so the eight short rows stay scannable. The
  * green display pull-line carries the document's own argument (planning over
- * money), the pledges run as a two-column ledger under heavy ink rules, and a
- * wide image slot closes the movement where a photograph of the district
- * will sit.
+ * money), and the pledges run as a two-column ledger under heavy ink rules
+ * straight into the cut that hands over to the closing green plane.
  */
 export function PledgeGrid() {
   return (
@@ -40,12 +38,6 @@ export function PledgeGrid() {
           </div>
         ))}
       </div>
-      <CampaignImage
-        alt={agendaContent.pledgesImageAlt}
-        tone="green-deep"
-        sizes="100vw"
-        className="mt-4 aspect-[4/3] w-full sm:aspect-[21/9] lg:mt-8"
-      />
     </div>
   );
 }

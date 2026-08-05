@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { siteContent } from "@/content/site";
 
 const LINKS = [
   { href: "/#about", label: "About" },
@@ -85,7 +87,16 @@ export function Nav() {
     <header className="sticky top-0 z-50">
       <div className="border-b border-ink/10 bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 sm:px-8 lg:px-12">
-          <Link href="/" className="font-display text-xl font-semibold text-ink">
+          {/*
+           * Type-first identity: the wordmark carries the name, the round
+           * mark rides beside it at cap height with an empty alt so the
+           * link still reads as plain "OTO".
+           */}
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 font-display text-xl font-semibold text-ink"
+          >
+            <Image src={siteContent.logo.src} alt={siteContent.logo.alt} width={26} height={26} />
             OTO
           </Link>
 

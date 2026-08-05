@@ -1,5 +1,4 @@
 import { Heading } from "@/components/primitives/Heading";
-import { CampaignImage } from "@/components/primitives/CampaignImage";
 import { agendaContent, type AgendaItem } from "@/content/agenda";
 
 /*
@@ -77,19 +76,9 @@ export function AgendaLedger() {
       >
         When you get there, what do you have in mind <span className="text-brand-gold">for us?</span>
       </Heading>
-      <div className="mt-8 grid gap-x-12 gap-y-10 lg:mt-12 lg:grid-cols-12 lg:items-end">
-        <p className="max-w-2xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg lg:col-span-7">
-          {agendaContent.intro}
-        </p>
-        <div className="lg:col-span-5">
-          <CampaignImage
-            alt={agendaContent.imageAlt}
-            tone="green"
-            sizes="(min-width: 1024px) 40vw, 100vw"
-            className="aspect-[16/10] w-full"
-          />
-        </div>
-      </div>
+      <p className="mt-8 max-w-2xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg lg:mt-12">
+        {agendaContent.intro}
+      </p>
       <div className="mt-12 lg:mt-16">
         {agendaContent.items.map((item) => (
           <AgendaItemRow key={item.number} item={item} />

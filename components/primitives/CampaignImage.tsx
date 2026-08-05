@@ -2,17 +2,33 @@ import Image from "next/image";
 
 type CampaignImageTone = "green" | "green-bright" | "green-deep" | "gold" | "red";
 
+type CampaignImageFit = "cover" | "cutout";
+
 type CampaignImageProps = {
   /*
-   * Optional on purpose. The client's photos of the candidate arrive later;
-   * until then every slot renders as a flat brand-color plane that is part of
-   * the page's poster composition, not a placeholder graphic. No stock
-   * imagery, no external URLs, ever.
+   * Still optional on purpose. The candidate's portraits now fill the main
+   * slots, but any slot whose photograph has not arrived renders as a flat
+   * brand-color plane that belongs to the page's poster composition, not a
+   * placeholder graphic. No stock imagery, no external URLs, ever.
    */
   src?: string;
   alt: string;
   tone?: CampaignImageTone;
+  /*
+   * "cover" frames conventional photography inside its box. "cutout" is for
+   * the alpha-cut portraits: the full figure scales inside the box and
+   * anchors to its bottom edge, so the flat crop line of the bust lands
+   * exactly on whatever plane edge the section composes it against. Nothing
+   * is ever painted behind a real photo; the plane the section provides shows
+   * through the alpha.
+   */
+  fit?: CampaignImageFit;
   sizes?: string;
+  /*
+   * Set on the one image that is the page's largest contentful paint (the
+   * hero portrait) so the browser fetches it before layout settles.
+   */
+  preload?: boolean;
   className?: string;
 };
 
@@ -24,11 +40,18 @@ const TONE_PLANE: Record<CampaignImageTone, string> = {
   red: "bg-brand-red",
 };
 
+const FIT_IMAGE: Record<CampaignImageFit, string> = {
+  cover: "object-cover",
+  cutout: "object-contain object-bottom",
+};
+
 export function CampaignImage({
   src,
   alt,
   tone = "green",
+  fit = "cover",
   sizes,
+  preload,
   className = "",
 }: CampaignImageProps) {
   if (!src) {
@@ -42,8 +65,8 @@ export function CampaignImage({
   }
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
-      <Image src={src} alt={alt} fill sizes={sizes} className="object-cover" />
+    <div className={`relative ${fit === "cover" ? "overflow-hidden" : ""} ${className}`}>
+      <Image src={src} alt={alt} fill sizes={sizes} preload={preload} className={FIT_IMAGE[fit]} />
     </div>
   );
 }

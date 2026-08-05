@@ -46,7 +46,7 @@ export default function HomePage() {
         <Hero
           headline={homeContent.headline}
           intro={homeContent.intro}
-          portraitAlt={homeContent.portraitAlt}
+          portrait={homeContent.portrait}
         />
       </Section>
       <PlaneCut from="green" to="surface" />

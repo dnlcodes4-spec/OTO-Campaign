@@ -6,9 +6,18 @@ import { getInvolvedContent } from "@/content/get-involved";
  * The last question on the page turns back on the reader. The turnout story
  * leads at display scale (four million registered, a third showing up), then
  * the four asks run as a numbered ledger, numbered because they escalate:
- * decide, persuade, volunteer, commit. The portrait slot rides the right
- * column beside the asks on desktop and closes the section on mobile, the
- * candidate alongside the ask itself.
+ * decide, persuade, volunteer, commit.
+ *
+ * The grey-suit cut-out grounds the ask. On desktop it holds the bottom left
+ * while the ledger runs down the right, mirroring the hero where the
+ * candidate holds the bottom right: the page opens and closes with him
+ * breaking a diagonal cut. Like the other two portraits he rises out of a
+ * diagonal-topped panel, here in the deep green of the incoming vote-targets
+ * plane. The panel overruns the section by its bottom padding plus the strip
+ * height (4+3rem, 5+4rem at sm, 7+6rem at lg), crossing the green-to-ink
+ * diagonal and dissolving seamlessly into the plane below, so the candidate
+ * stands on a tongue of the next plane rising through the cut. On mobile the
+ * asks read first and the portrait closes the section the same way.
  */
 export function GetInvolvedBlock() {
   return (
@@ -29,7 +38,7 @@ export function GetInvolvedBlock() {
         </p>
       </div>
       <div className="mt-12 grid gap-x-12 gap-y-10 lg:mt-16 lg:grid-cols-12">
-        <ol className="lg:col-span-7">
+        <ol className="lg:col-span-7 lg:col-start-6 lg:row-start-1">
           {getInvolvedContent.asks.map((ask) => (
             <li
               key={ask.number}
@@ -49,13 +58,20 @@ export function GetInvolvedBlock() {
             </li>
           ))}
         </ol>
-        <div className="lg:col-span-5">
-          <CampaignImage
-            alt={getInvolvedContent.imageAlt}
-            tone="green-deep"
-            sizes="(min-width: 1024px) 40vw, 100vw"
-            className="aspect-[4/5] w-full sm:aspect-[16/10] lg:aspect-auto lg:h-full"
-          />
+        <div className="lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:justify-end">
+          <div className="relative z-5 -mb-28 sm:-mb-36 lg:-mb-52">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-brand-green-deep [clip-path:polygon(0_30%,100%_12%,100%_100%,0_100%)]"
+            />
+            <CampaignImage
+              src={getInvolvedContent.image.src}
+              alt={getInvolvedContent.image.alt}
+              fit="cutout"
+              sizes="(min-width: 1152px) 412px, (min-width: 1024px) 40vw, 100vw"
+              className="aspect-[1600/1235] w-full"
+            />
+          </div>
         </div>
       </div>
     </div>

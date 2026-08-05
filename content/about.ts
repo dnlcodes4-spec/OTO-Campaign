@@ -7,6 +7,10 @@ export type EducationEntry = {
 export const aboutContent = {
   nameParts: ["Oluwasegun", "Theophilus", "Oladimeji"],
   nameNote: "Three names. Their first letters are what Oyo South calls him: OTO.",
+  portrait: {
+    src: "/images/oto-suit-2.png",
+    alt: "Oluwasegun Theophilus Oladimeji in a navy pinstripe suit",
+  },
   party: "Zenith Labour Party",
   district: "Oyo South Senatorial District",
   abujaAnswer: "OTO is very hardworking.",

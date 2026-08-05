@@ -92,6 +92,14 @@ describe("Nav", () => {
     expect(screen.getByRole("link", { name: "OTO" })).toHaveAttribute("href", "/");
   });
 
+  test("pairs the logo mark with the wordmark without renaming the link", () => {
+    const { container } = render(<Nav />);
+    const mark = container.querySelector('img[src*="oto-logo"]');
+    expect(mark).not.toBeNull();
+    expect(mark).toHaveAttribute("alt", "");
+    expect(screen.getByRole("link", { name: "OTO" })).toHaveAttribute("href", "/");
+  });
+
   test("aria-controls only points at the overlay while it exists", () => {
     render(<Nav />);
     const openButton = screen.getByRole("button", { name: "Open menu" });

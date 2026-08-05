@@ -20,7 +20,6 @@ export type Pledge = {
 export const agendaContent = {
   intro:
     "The question most people going to the Senate from Oyo South never answered before they took their seat. Little wonder their four or more years were usually uneventful, and their names are appended to no piece of legislation. So here is the agenda, in writing, before you vote.",
-  imageAlt: "OTO at work across the Oyo South Senatorial District",
   items: [
     {
       number: "1",
@@ -90,7 +89,6 @@ export const agendaContent = {
     "Much of this costs the office nothing but follow-through: connecting opportunities that already exist in the district with investors who are already looking for them.",
   pledgesPull:
     "Not everything requires money. Most of what fails in society fails for lack of planning.",
-  pledgesImageAlt: "OTO among the people of Ibadan and Oyo South",
   pledges: [
     {
       title: "Scholarships",

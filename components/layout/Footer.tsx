@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import { siteContent } from "@/content/site";
 
 const LINKS = [
   { href: "/#about", label: "About" },
@@ -12,7 +14,10 @@ export function Footer() {
     <footer className="bg-brand-green-deep px-6 py-12 text-ink-inverse sm:px-8 lg:px-12">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="font-display text-2xl font-semibold">OTO</p>
+          <div className="flex items-center gap-3">
+            <Image src={siteContent.logo.src} alt={siteContent.logo.alt} width={32} height={32} />
+            <p className="font-display text-2xl font-semibold">OTO</p>
+          </div>
           <p className="mt-2 max-w-sm font-body text-sm text-ink-inverse/80">
             Oluwasegun Theophilus Oladimeji, Zenith Labour Party candidate for the Oyo South Senatorial District.
           </p>
