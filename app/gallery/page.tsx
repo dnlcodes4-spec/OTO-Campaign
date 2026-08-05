@@ -3,7 +3,7 @@ import { getGalleryItems } from "@/content/gallery";
 import { GalleryGrid } from "@/components/sections/GalleryGrid";
 
 export const metadata: Metadata = {
-  title: "Gallery | OTO for Senate",
+  title: "Gallery",
   description: "Photos and video from the OTO for Senate campaign trail.",
 };
 

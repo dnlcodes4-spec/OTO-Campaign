@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Section } from "@/components/primitives/Section";
 import { Hero } from "@/components/sections/Hero";
 import { PedigreeBlock } from "@/components/sections/PedigreeBlock";
@@ -8,11 +7,13 @@ import { GetInvolvedBlock } from "@/components/sections/GetInvolvedBlock";
 import { VoteTargets } from "@/components/sections/VoteTargets";
 import { homeContent } from "@/content/home";
 
-export const metadata: Metadata = {
-  title: "OTO for Senate | Oyo South Senatorial District",
-  description:
-    "Oluwasegun Theophilus Oladimeji, Zenith Labour Party candidate for the Oyo South Senatorial District.",
-};
+/*
+ * No page-level metadata here: this route's title and description are
+ * exactly the root layout's default (app/layout.tsx), so it inherits
+ * them. Defining the same string again would run it through the
+ * layout's title template a second time ("... | OTO for Senate | OTO
+ * for Senate").
+ */
 
 type PlaneTone = "surface" | "green" | "ink";
 
