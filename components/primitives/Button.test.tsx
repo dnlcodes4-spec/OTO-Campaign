@@ -36,4 +36,12 @@ describe("Button", () => {
     render(<Button href="/agenda">Read the agenda</Button>);
     expect(screen.getByRole("link").textContent).not.toContain("→");
   });
+
+  test("carries the branded focus-visible outline on every render path", () => {
+    const { rerender } = render(<Button href="/agenda">Read the agenda</Button>);
+    expect(screen.getByRole("link").className).toContain("focus-visible:outline-brand-gold");
+
+    rerender(<Button onClick={() => {}}>Try again</Button>);
+    expect(screen.getByRole("button").className).toContain("focus-visible:outline-brand-gold");
+  });
 });

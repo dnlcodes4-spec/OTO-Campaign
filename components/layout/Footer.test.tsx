@@ -21,4 +21,11 @@ describe("Footer", () => {
     expect(mark).not.toBeNull();
     expect(mark).toHaveAttribute("alt", "");
   });
+
+  test("nav links carry the branded focus-visible outline", () => {
+    render(<Footer />);
+    expect(screen.getByRole("link", { name: "About" }).className).toContain(
+      "focus-visible:outline-brand-gold"
+    );
+  });
 });

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import { Nav } from "./Nav";
 
 vi.mock("next/navigation", () => ({
@@ -127,5 +127,91 @@ describe("Nav", () => {
     expect(document.body.style.overflow).toBe("");
     expect(openButton).toHaveAttribute("aria-expanded", "false");
     expect(openButton).not.toHaveAttribute("aria-controls");
+  });
+
+  test("the open overlay carries dialog semantics, absent while closed", () => {
+    render(<Nav />);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    const dialog = screen.getByRole("dialog", { name: "Site menu" });
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Close menu" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  test("inerts the background landmarks while the menu is open and restores them on close", () => {
+    render(
+      <>
+        <Nav />
+        <main>Page content</main>
+        <footer>Footer content</footer>
+      </>
+    );
+    const main = screen.getByText("Page content");
+    const footer = screen.getByText("Footer content");
+    expect(main).not.toHaveAttribute("inert");
+    expect(footer).not.toHaveAttribute("inert");
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    expect(main).toHaveAttribute("inert");
+    expect(footer).toHaveAttribute("inert");
+
+    fireEvent.click(screen.getByRole("button", { name: "Close menu" }));
+    expect(main).not.toHaveAttribute("inert");
+    expect(footer).not.toHaveAttribute("inert");
+  });
+
+  test("restores the inerted background when the viewport crosses into desktop", () => {
+    const { crossToDesktop } = stubMatchMedia();
+    render(
+      <>
+        <Nav />
+        <main>Page content</main>
+      </>
+    );
+    const main = screen.getByText("Page content");
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    expect(main).toHaveAttribute("inert");
+
+    crossToDesktop();
+    expect(main).not.toHaveAttribute("inert");
+  });
+
+  test("tab from the last focusable link wraps to the first, shift+tab from the first wraps to the last", () => {
+    render(<Nav />);
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Site menu" });
+    const homeLink = within(dialog).getByRole("link", { name: "OTO" });
+    const galleryLink = within(dialog).getByRole("link", { name: "Gallery" });
+
+    galleryLink.focus();
+    fireEvent.keyDown(galleryLink, { key: "Tab" });
+    expect(document.activeElement).toBe(homeLink);
+
+    homeLink.focus();
+    fireEvent.keyDown(homeLink, { key: "Tab", shiftKey: true });
+    expect(document.activeElement).toBe(galleryLink);
+  });
+
+  test("nav links and controls carry the branded focus-visible outline", () => {
+    render(<Nav />);
+    expect(screen.getByRole("link", { name: "OTO" }).className).toContain(
+      "focus-visible:outline-brand-gold"
+    );
+    expect(screen.getByRole("link", { name: "About" }).className).toContain(
+      "focus-visible:outline-brand-gold"
+    );
+    expect(screen.getByRole("button", { name: "Open menu" }).className).toContain(
+      "focus-visible:outline-brand-gold"
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    expect(screen.getByRole("button", { name: "Close menu" }).className).toContain(
+      "focus-visible:outline-brand-gold"
+    );
   });
 });

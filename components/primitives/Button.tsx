@@ -33,8 +33,21 @@ const TONE_TEXT: Record<ButtonTone, string> = {
   green: "text-brand-green border-brand-green",
 };
 
+/*
+ * Branded focus-visible outline, token-based so it reads on every tone and
+ * plane this button renders against (solid fills, text-only underlines,
+ * light and dark surfaces alike). Deliberately not paired with
+ * outline-none/outline-hidden: those set Tailwind's shared --tw-outline-style
+ * variable to "none" unconditionally, and focus-visible:outline-2 reads that
+ * same variable, so the two would cancel out and the ring would never
+ * render. outline-style is already "none" at rest (the CSS initial value),
+ * so nothing needs suppressing there.
+ */
+const FOCUS_RING =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold";
+
 function buttonClasses(tone: ButtonTone, variant: ButtonVariant, className: string) {
-  const base = "inline-flex items-center gap-2 font-body font-medium transition-colors";
+  const base = `inline-flex items-center gap-2 font-body font-medium transition-colors ${FOCUS_RING}`;
   if (variant === "solid") {
     return `${base} px-6 py-3 text-sm ${TONE_SOLID[tone]} ${className}`;
   }
