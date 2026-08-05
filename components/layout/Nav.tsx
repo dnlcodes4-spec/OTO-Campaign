@@ -64,6 +64,23 @@ export function Nav() {
     }
   }, [open]);
 
+  /*
+   * The overlay and the scroll lock are both lg:hidden in spirit, but "open"
+   * is plain state that does not know about the viewport. Without this, a
+   * tablet rotated from portrait to landscape while the menu is open crosses
+   * the lg breakpoint, the overlay and hamburger both disappear under
+   * lg:hidden, and the body scroll lock from the effect above is never
+   * cleaned up because open never flips back to false.
+   */
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1024px)");
+    const onChange = (event: MediaQueryListEvent) => {
+      if (event.matches) setOpen(false);
+    };
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+
   return (
     <header className="sticky top-0 z-50">
       <div className="border-b border-ink/10 bg-surface/95 backdrop-blur">
@@ -94,7 +111,7 @@ export function Nav() {
             className="flex flex-col gap-1.5 lg:hidden"
             aria-label="Open menu"
             aria-expanded={open}
-            aria-controls="mobile-menu"
+            {...(open ? { "aria-controls": "mobile-menu" } : {})}
             onClick={() => setOpen(true)}
           >
             <span className="h-0.5 w-6 bg-ink" />
