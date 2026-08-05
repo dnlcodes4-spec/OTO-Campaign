@@ -2,7 +2,7 @@
 
 Extracted from `docs/oto.docx` (client-provided source document).
 
-- **Candidate:** OTO
+- **Candidate:** OTO (campaign nickname) — legal name **Oluwasegun Theophilus Oladimeji**
 - **Race:** Oyo South Senatorial District
 - **Party:** Zenith Labour Party (ZLP)
 - **Website:** https://otoforsenate.ng/
@@ -128,7 +128,7 @@ Framed as low/no personal cost to the candidate — mainly about connecting exis
 
 ## Source Notes
 
-- Original file: `docs/oto.docx` (DOCX, ~5.3 MB — contains ~45 embedded decorative/layout images alongside the text).
-- Document metadata: created/last modified 2026-08-02, authored by "HARDEY," last edited by "Theo Oladimeji" (likely the document's designer, not the candidate).
-- The candidate is referred to throughout only as **"OTO"** — no fuller legal name appears in the source document. Confirm with the client whether "OTO" is a full name, initials, or a campaign nickname/acronym before publishing.
+- Original file: `docs/oto.docx` (DOCX, ~5.3 MB — contains 46 embedded images alongside the text; extracted and reviewed, but none were usable design assets, so they were discarded).
+- Document metadata: created/last modified 2026-08-02, authored by "HARDEY," last edited by "Theo Oladimeji" — very likely the candidate himself, given his legal name.
+- The candidate is referred to throughout only as **"OTO"** — confirmed with the client that this is the campaign nickname; legal name is **Oluwasegun Theophilus Oladimeji**.
 - Body copy repeats itself in a couple of places in the source (e.g. the "legislative agenda" intro and the Benin/Sierra Leone/Burkina Faso religion stat) — likely draft duplication from the original layout tool rather than intentional repetition; consolidated once here.
