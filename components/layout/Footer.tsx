@@ -18,9 +18,24 @@ export function Footer() {
             <Image src={siteContent.logo.src} alt={siteContent.logo.alt} width={32} height={32} />
             <p className="font-display text-2xl font-semibold">OTO</p>
           </div>
-          <p className="mt-2 max-w-sm font-body text-sm text-ink-inverse/80">
-            Oluwasegun Theophilus Oladimeji, Zenith Labour Party candidate for the Oyo South Senatorial District.
-          </p>
+          {/*
+           * Party identification runs as one unit under the candidate
+           * identity: the ZLP badge, the white card on the deep green
+           * plane as everywhere else on the site, set beside the line
+           * that names the party.
+           */}
+          <div className="mt-4 flex items-start gap-4">
+            <Image
+              src={siteContent.partyLogo.src}
+              alt={siteContent.partyLogo.alt}
+              width={93}
+              height={80}
+              className="h-12 w-auto shrink-0"
+            />
+            <p className="max-w-sm font-body text-sm text-ink-inverse/80">
+              Oluwasegun Theophilus Oladimeji, Zenith Labour Party candidate for the Oyo South Senatorial District.
+            </p>
+          </div>
         </div>
         {/*
          * Footer sits on bg-brand-green-deep throughout, so the gold ring

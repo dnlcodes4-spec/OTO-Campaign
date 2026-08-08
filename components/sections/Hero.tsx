@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { Heading } from "@/components/primitives/Heading";
 import { CampaignImage } from "@/components/primitives/CampaignImage";
+import { siteContent } from "@/content/site";
 
 type HeroProps = {
   headline: string;
@@ -31,6 +33,13 @@ type HeroProps = {
  * intro hold the full width with nothing beside them, then the portrait
  * takes its own right-aligned block under the text, leaving a rail of green
  * on the left, and runs into the cut the same way.
+ *
+ * The party badge closes the text stack the way a printed poster signs off:
+ * seal-scale at the lower left of the headline column, flush with the text
+ * edge, the endorsement answering the candidate at the lower right. The
+ * badge is the party's white card sitting directly on the green plane, its
+ * own rounded edge and no added frame, and it is preloaded because the
+ * whole point of the placement is that it is inside the first viewport.
  */
 export function Hero({ headline, intro, portrait }: HeroProps) {
   const words = headline.split(" ");
@@ -55,6 +64,14 @@ export function Hero({ headline, intro, portrait }: HeroProps) {
         <p className="mt-8 max-w-md font-body text-base leading-relaxed text-ink-inverse/80 sm:text-lg lg:mt-12 lg:max-w-lg">
           {intro}
         </p>
+        <Image
+          src={siteContent.partyLogo.src}
+          alt={siteContent.partyLogo.alt}
+          width={93}
+          height={80}
+          preload
+          className="mt-10 h-auto w-20 sm:w-24 lg:mt-12"
+        />
       </div>
       <div className="relative z-5 -mb-28 w-[82%] justify-self-end sm:-mb-36 sm:w-[68%] lg:absolute lg:-bottom-52 lg:right-0 lg:mb-0 lg:w-[44%]">
         <div
