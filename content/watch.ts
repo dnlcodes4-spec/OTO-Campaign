@@ -31,7 +31,6 @@ export const watchContent: WatchContent = {
   body: "Every answer on this page is a commitment the candidate makes in his own voice. The campaign is putting that case on film so you can weigh the messenger along with the message, and hold him to every word of it.",
   coming: {
     line: "The film is coming.",
-    detail:
-      "When it lands, it plays on this plane first and it plays in full. Until then, the page holds his seat.",
+    detail: "",
   },
 };
