@@ -4,6 +4,7 @@ import { PedigreeBlock } from "@/components/sections/PedigreeBlock";
 import { AtunlutoBlock } from "@/components/sections/AtunlutoBlock";
 import { AgendaLedger } from "@/components/sections/AgendaLedger";
 import { PledgeGrid } from "@/components/sections/PledgeGrid";
+import { WatchBlock } from "@/components/sections/WatchBlock";
 import { GetInvolvedBlock } from "@/components/sections/GetInvolvedBlock";
 import { VoteTargets } from "@/components/sections/VoteTargets";
 import { homeContent } from "@/content/home";
@@ -25,7 +26,7 @@ const PLANE_BG: Record<PlaneTone, string> = {
 };
 
 /*
- * The landing page is the whole site now: six flat planes meeting on
+ * The landing page is the whole site now: seven flat planes meeting on
  * parallel diagonal cuts, the device the campaign's printed material uses,
  * so the scroll reads as one long poster rather than a stack of sections.
  * Each cut is a strip painted in the outgoing plane's color with the
@@ -64,7 +65,16 @@ export default function HomePage() {
       <Section>
         <PledgeGrid />
       </Section>
-      <PlaneCut from="surface" to="green" />
+      {/*
+       * The film plane: the written case is complete, so the candidate makes
+       * it in his own voice before the page turns to the reader with its ask.
+       * See WatchBlock for the full position and state rationale.
+       */}
+      <PlaneCut from="surface" to="ink" />
+      <Section id="watch" tone="ink">
+        <WatchBlock />
+      </Section>
+      <PlaneCut from="ink" to="green" />
       <Section id="get-involved" tone="green">
         <GetInvolvedBlock />
       </Section>

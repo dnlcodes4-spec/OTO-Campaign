@@ -20,10 +20,11 @@ describe("Home page", () => {
     ).toBeInTheDocument();
   });
 
-  test("carries the three one-page sections by id", () => {
+  test("carries the four one-page sections by id", () => {
     const { container } = render(<HomePage />);
     getSection(container, "about");
     getSection(container, "agenda");
+    getSection(container, "watch");
     getSection(container, "get-involved");
   });
 
@@ -89,6 +90,19 @@ describe("Home page", () => {
     expect(hero?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
     const targets = screen.getByText("500,000").closest("section");
     expect(targets?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
+  });
+
+  test("the film plane holds its promise without an embed while the video is unreleased", () => {
+    const { container } = render(<HomePage />);
+    const watch = getSection(container, "watch");
+    expect(
+      within(watch).getByRole("heading", {
+        level: 2,
+        name: "Why should you believe a word of this?",
+      })
+    ).toBeInTheDocument();
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(watch.querySelector("img")).toBeNull();
   });
 
   test("get involved carries the asks and the vote targets", () => {
