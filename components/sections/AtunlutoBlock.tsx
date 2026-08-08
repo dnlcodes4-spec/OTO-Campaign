@@ -58,7 +58,9 @@ export function AtunlutoBlock() {
 
       <div className="mt-12 grid gap-x-12 gap-y-10 lg:grid-cols-12">
         <div className="lg:col-span-5">
-          <Heading level={4}>{atunlutoContent.running.title}</Heading>
+          <Heading level={3} sizeOverride="text-xl sm:text-2xl leading-tight">
+            {atunlutoContent.running.title}
+          </Heading>
           <ul className="mt-3 divide-y divide-ink/10">
             {atunlutoContent.running.entries.map((entry) => (
               <li key={entry} className="py-2.5 font-body text-sm leading-relaxed text-ink/70">
@@ -68,7 +70,9 @@ export function AtunlutoBlock() {
           </ul>
         </div>
         <div className="lg:col-span-7">
-          <Heading level={4}>{atunlutoContent.pillars.title}</Heading>
+          <Heading level={3} sizeOverride="text-xl sm:text-2xl leading-tight">
+            {atunlutoContent.pillars.title}
+          </Heading>
           <ul className="mt-3 max-w-xl divide-y divide-ink/10">
             {atunlutoContent.pillars.entries.map((entry) => (
               <li key={entry} className="py-2.5 font-body text-sm leading-relaxed text-ink/70">

@@ -37,6 +37,17 @@ describe("AtunlutoBlock", () => {
     }
   });
 
+  test("steps the heading hierarchy one level at a time", () => {
+    render(<AtunlutoBlock />);
+    expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(1);
+    const subheads = screen.getAllByRole("heading", { level: 3 });
+    expect(subheads.map((heading) => heading.textContent)).toEqual([
+      atunlutoContent.running.title,
+      atunlutoContent.pillars.title,
+    ]);
+    expect(screen.queryAllByRole("heading", { level: 4 })).toHaveLength(0);
+  });
+
   test("states the cooperative model in the support copy", () => {
     render(<AtunlutoBlock />);
     expect(screen.getByText(/cooperative thrift/)).toBeInTheDocument();
