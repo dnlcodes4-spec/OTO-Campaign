@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Standalone output is for self-hosted deploys only. Vercel's build
+  // pipeline expects the default output and fails on standalone traces.
+  output: process.env.VERCEL ? undefined : "standalone",
 };
 
 export default nextConfig;
