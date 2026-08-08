@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import { Nav } from "./Nav";
+import { socials } from "@/content/site";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
@@ -186,15 +187,48 @@ describe("Nav", () => {
 
     const dialog = screen.getByRole("dialog", { name: "Site menu" });
     const homeLink = within(dialog).getByRole("link", { name: "OTO" });
-    const galleryLink = within(dialog).getByRole("link", { name: "Gallery" });
+    // The coda's social marks now sit after the destination links, so the
+    // overlay's last focusable control is the final social channel.
+    const lastSocial = within(dialog).getByRole("link", {
+      name: `OTO on ${socials[socials.length - 1].label}`,
+    });
 
-    galleryLink.focus();
-    fireEvent.keyDown(galleryLink, { key: "Tab" });
+    lastSocial.focus();
+    fireEvent.keyDown(lastSocial, { key: "Tab" });
     expect(document.activeElement).toBe(homeLink);
 
     homeLink.focus();
     fireEvent.keyDown(homeLink, { key: "Tab", shiftKey: true });
-    expect(document.activeElement).toBe(galleryLink);
+    expect(document.activeElement).toBe(lastSocial);
+  });
+
+  test("desktop header carries the four social channels after the section links", () => {
+    render(<Nav />);
+    expect(socials.map((social) => social.label)).toEqual([
+      "Facebook",
+      "Twitter",
+      "Instagram",
+      "YouTube",
+    ]);
+    for (const social of socials) {
+      const link = screen.getByRole("link", { name: `OTO on ${social.label}` });
+      expect(link).toHaveAttribute("href", social.href);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+      // Header bar is the light plane, so the ring is green there.
+      expect(link.className).toContain("focus-visible:outline-brand-green");
+    }
+  });
+
+  test("the overlay coda repeats the social channels with the dark-plane gold ring", () => {
+    render(<Nav />);
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    const dialog = screen.getByRole("dialog", { name: "Site menu" });
+    for (const social of socials) {
+      const link = within(dialog).getByRole("link", { name: `OTO on ${social.label}` });
+      expect(link).toHaveAttribute("href", social.href);
+      expect(link.className).toContain("focus-visible:outline-brand-gold");
+    }
   });
 
   test("light-plane header controls carry a dark, high-contrast focus-visible outline", () => {

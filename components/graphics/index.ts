@@ -15,3 +15,20 @@ export { StatePolice } from "./StatePolice";
 export { Residency } from "./Residency";
 export { SecularState } from "./SecularState";
 export { FederatingZones } from "./FederatingZones";
+
+/*
+ * The social marks are the second family in here: the platforms'
+ * recognizable marks kept faithful, but rendered the way everything else
+ * on the site is drawn, as clean flat fills, never stroke-icon-library
+ * grammar. currentColor only, no second color and no raw hex, so each mark
+ * takes the exact link color of the plane it sits on. All are aria-hidden;
+ * the surrounding link's aria-label names the platform.
+ */
+export type SocialMarkProps = {
+  className?: string;
+};
+
+export { FacebookMark } from "./FacebookMark";
+export { TwitterMark } from "./TwitterMark";
+export { InstagramMark } from "./InstagramMark";
+export { YouTubeMark } from "./YouTubeMark";

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { siteContent } from "@/content/site";
+import { SocialLinks } from "./SocialLinks";
 
 const LINKS = [
   { href: "/#about", label: "About" },
@@ -194,6 +195,16 @@ export function Nav() {
                 {link.label}
               </Link>
             ))}
+            {/*
+             * The channel marks close the bar after the destinations,
+             * separated by a hairline and sized under the text links:
+             * secondary wayfinding, not a fifth destination.
+             */}
+            <SocialLinks
+              plane="light"
+              markClassName="h-4 w-4"
+              className="gap-4 border-l border-ink/15 pl-8"
+            />
           </nav>
 
           <button
@@ -260,8 +271,16 @@ export function Nav() {
             <div aria-hidden="true" className="relative mt-10 h-10 w-full sm:h-12">
               <div className="absolute inset-0 bg-brand-green-deep [clip-path:polygon(0_100%,100%_0,100%_100%)]" />
             </div>
+            {/*
+             * The coda already carries the campaign's identity line, so the
+             * channels live with it: a row of marks over the party line,
+             * inside the deep green plane the diagonal cut opens. They keep
+             * their own tab-order slot after the destinations, which makes
+             * the last of them the overlay's final focusable control.
+             */}
             <div className="bg-brand-green-deep px-6 pt-1 pb-8 sm:px-8">
-              <p className="font-body text-sm text-ink-inverse/70">
+              <SocialLinks plane="dark" markClassName="h-6 w-6" className="gap-7 py-2" />
+              <p className="mt-4 font-body text-sm text-ink-inverse/70">
                 <span className="text-brand-gold">Zenith Labour Party.</span> Oyo South
                 Senatorial District.
               </p>

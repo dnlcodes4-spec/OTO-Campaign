@@ -23,3 +23,26 @@ export const siteContent = {
     alt: "Zenith Labour Party logo",
   },
 };
+
+export type SocialPlatform = "facebook" | "twitter" | "instagram" | "youtube";
+
+export type SocialLink = {
+  platform: SocialPlatform;
+  label: string;
+  href: string;
+};
+
+/*
+ * PLACEHOLDERS: the campaign's profiles are not live yet, so every href
+ * points at the platform's root. When the client shares the real profile
+ * URLs, swap each href below in place, one line per platform. Labels and
+ * platform keys stay as they are; every rendered row reads from this array,
+ * so nothing else changes. The Twitter entry keeps "Twitter" as its
+ * accessible label while the rendered glyph is the X mark.
+ */
+export const socials: SocialLink[] = [
+  { platform: "facebook", label: "Facebook", href: "https://www.facebook.com/" },
+  { platform: "twitter", label: "Twitter", href: "https://x.com/" },
+  { platform: "instagram", label: "Instagram", href: "https://www.instagram.com/" },
+  { platform: "youtube", label: "YouTube", href: "https://www.youtube.com/" },
+];

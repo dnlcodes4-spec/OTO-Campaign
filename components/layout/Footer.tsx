@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { siteContent } from "@/content/site";
+import { SocialLinks } from "./SocialLinks";
 
 const LINKS = [
   { href: "/#about", label: "About" },
@@ -54,6 +55,12 @@ export function Footer() {
               {link.label}
             </Link>
           ))}
+          {/*
+           * The channel marks close the column under the destinations in the
+           * same link grammar (soft inverse turning gold), right-aligned with
+           * the column at sm and up.
+           */}
+          <SocialLinks plane="dark" markClassName="h-5 w-5" className="mt-3 gap-5" />
         </nav>
       </div>
     </footer>
