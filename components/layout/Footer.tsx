@@ -33,7 +33,7 @@ export function Footer() {
               className="h-12 w-auto shrink-0"
             />
             <p className="max-w-sm font-body text-sm text-ink-inverse/80">
-              Oluwasegun Theophilus Oladimeji, Zenith Labour Party candidate for the Oyo South Senatorial District.
+              Oluwasegun Theophilus Oladimeji, Zenith Labour Party candidate for the Oyo South Senatorial District, from the Atunluto caucus within the party.
             </p>
           </div>
         </div>

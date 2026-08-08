@@ -29,6 +29,11 @@ describe("Footer", () => {
     expect(badge).toHaveAttribute("src", expect.stringContaining("zlp-logo.png"));
   });
 
+  test("names the Atunluto caucus in the identity line", () => {
+    render(<Footer />);
+    expect(screen.getByText(/from the Atunluto caucus/)).toBeInTheDocument();
+  });
+
   test("nav links carry the branded focus-visible outline", () => {
     render(<Footer />);
     expect(screen.getByRole("link", { name: "About" }).className).toContain(

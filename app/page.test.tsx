@@ -36,6 +36,17 @@ describe("Home page", () => {
     expect(within(about).getByText(/University of Portsmouth/)).toBeInTheDocument();
   });
 
+  test("about features the Atunluto structure inside its plane", () => {
+    const { container } = render(<HomePage />);
+    const about = getSection(container, "about");
+    expect(
+      within(about).getByText(/Atunluto caucus within the Zenith Labour Party/)
+    ).toBeInTheDocument();
+    expect(
+      within(about).getByRole("link", { name: /atunlutogroup\.org/ })
+    ).toHaveAttribute("href", "https://www.atunlutogroup.org");
+  });
+
   test("agenda carries the four legislative items", () => {
     const { container } = render(<HomePage />);
     const agenda = getSection(container, "agenda");
