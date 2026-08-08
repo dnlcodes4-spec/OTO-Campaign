@@ -3,9 +3,12 @@ import { CampaignImage } from "@/components/primitives/CampaignImage";
 import { getInvolvedContent } from "@/content/get-involved";
 
 /*
- * The last question on the page turns back on the reader. The four asks run
+ * The last question on the page turns back on the reader. The five asks run
  * as a numbered ledger down the right, numbered because they escalate:
- * decide, persuade, volunteer, commit.
+ * decide, persuade, volunteer, fund, commit. Five rows need tighter
+ * vertical padding than four did at lg, so the ledger's total height stays
+ * near the stat panel's and justify-between keeps distributing real
+ * breathing room instead of collapsing to packed rows.
  *
  * The left column is one composed unit: a deep-green panel that spans the
  * full column height, its top edge taking the page's diagonal, high on the
@@ -38,7 +41,7 @@ export function GetInvolvedBlock() {
           {getInvolvedContent.asks.map((ask) => (
             <li
               key={ask.number}
-              className="grid grid-cols-[auto_1fr] gap-x-6 border-t border-ink-inverse/20 py-6 sm:py-8 lg:gap-x-8 lg:py-10"
+              className="grid grid-cols-[auto_1fr] gap-x-6 border-t border-ink-inverse/20 py-6 sm:py-8 lg:gap-x-8"
             >
               <p className="font-display text-3xl font-semibold leading-none text-brand-gold sm:text-4xl">
                 {ask.number}

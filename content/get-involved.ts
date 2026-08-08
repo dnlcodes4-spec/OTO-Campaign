@@ -52,6 +52,12 @@ export const getInvolvedContent = {
     },
     {
       number: "4",
+      title: "Be financially committed",
+      detail:
+        "A campaign that answers to its people must be funded by its people. This one runs the Atunluto way, on the commitment of its own members and not the purse of a godfather. Every contribution, however small, keeps the message moving through all nine LGAs of Oyo South.",
+    },
+    {
+      number: "5",
       title: "Commit to the count",
       detail: "Help raise the votes that send this agenda to Abuja.",
     },

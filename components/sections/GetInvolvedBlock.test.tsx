@@ -24,9 +24,9 @@ describe("GetInvolvedBlock", () => {
     expect(getInvolvedContent.turnoutBody).toMatch(/Three million people sit out/);
   });
 
-  test("runs the four asks as a numbered ledger ahead of the portrait panel", () => {
+  test("runs the five asks as a numbered ledger ahead of the portrait panel", () => {
     render(<GetInvolvedBlock />);
-    expect(screen.getAllByRole("listitem")).toHaveLength(4);
+    expect(screen.getAllByRole("listitem")).toHaveLength(5);
     for (const ask of getInvolvedContent.asks) {
       expect(screen.getByRole("heading", { name: ask.title })).toBeInTheDocument();
     }
@@ -35,6 +35,26 @@ describe("GetInvolvedBlock", () => {
     expect(
       list.compareDocumentPosition(portrait) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
+  });
+
+  test("asks for financial commitment fourth, with the count kept last", () => {
+    expect(getInvolvedContent.asks.map((ask) => ask.number)).toEqual([
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+    ]);
+    expect(getInvolvedContent.asks.map((ask) => ask.title)).toEqual([
+      "Make up your mind",
+      "Talk to ten",
+      "Volunteer on the trail",
+      "Be financially committed",
+      "Commit to the count",
+    ]);
+    const financial = getInvolvedContent.asks[3];
+    expect(financial.detail).toMatch(/godfather/);
+    expect(financial.detail).toMatch(/nine LGAs of Oyo South/);
   });
 
   test("composes the portrait with its content-file description", () => {
