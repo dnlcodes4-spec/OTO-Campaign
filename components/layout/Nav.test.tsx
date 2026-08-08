@@ -231,6 +231,25 @@ describe("Nav", () => {
     }
   });
 
+  test("a social link in the overlay leaves the menu open for the visitor's return", () => {
+    // Deliberate divergence from the destination links: socials open a new
+    // tab, so the page underneath never changes and closing the menu would
+    // dump the returning visitor somewhere they did not choose to go.
+    render(<Nav />);
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    const dialog = screen.getByRole("dialog", { name: "Site menu" });
+
+    fireEvent.click(within(dialog).getByRole("link", { name: "OTO on Instagram" }));
+
+    expect(screen.getByRole("dialog", { name: "Site menu" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open menu" })).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    );
+    expect(document.body.style.overflow).toBe("hidden");
+  });
+
   test("light-plane header controls carry a dark, high-contrast focus-visible outline", () => {
     render(<Nav />);
     // Header bar sits on bg-surface (#f7f8f9). brand-gold only reaches 1.69:1

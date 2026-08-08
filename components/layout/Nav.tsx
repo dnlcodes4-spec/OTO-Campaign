@@ -277,6 +277,12 @@ export function Nav() {
              * inside the deep green plane the diagonal cut opens. They keep
              * their own tab-order slot after the destinations, which makes
              * the last of them the overlay's final focusable control.
+             *
+             * Deliberately no setOpen(false) here, unlike every destination
+             * link above: these open the platform in a new tab, the page
+             * underneath never navigates, so the menu stays up and the
+             * returning visitor lands exactly where they left. Closing it
+             * would silently move them somewhere they did not choose to go.
              */}
             <div className="bg-brand-green-deep px-6 pt-1 pb-8 sm:px-8">
               <SocialLinks plane="dark" markClassName="h-6 w-6" className="gap-7 py-2" />

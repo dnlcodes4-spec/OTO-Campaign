@@ -52,7 +52,13 @@ export function VideoFacade({ videoId, title }: VideoFacadeProps) {
     <button
       type="button"
       onClick={() => setPlaying(true)}
-      aria-label={`Play ${title}`}
+      /*
+       * WCAG 2.5.3 Label in Name: the accessible name starts with the
+       * control's visible words ("Play the film") verbatim, so a
+       * voice-control user can speak what they see; the film title rides
+       * behind it for screen reader context.
+       */
+      aria-label={`Play the film: ${title}`}
       className="group relative block aspect-video w-full overflow-hidden text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
     >
       {thumb === "plane" ? (
