@@ -4,6 +4,7 @@ import HomePage from "./page";
 import { homeContent } from "@/content/home";
 import { aboutContent } from "@/content/about";
 import { getInvolvedContent } from "@/content/get-involved";
+import { siteContent } from "@/content/site";
 
 function getSection(container: HTMLElement, id: string) {
   const section = container.querySelector(`#${id}`);
@@ -51,7 +52,7 @@ describe("Home page", () => {
 
   test("composes the three candidate portraits with their content-file alt text", () => {
     render(<HomePage />);
-    expect(screen.getAllByRole("img")).toHaveLength(3);
+    expect(screen.getAllByRole("img")).toHaveLength(5);
     expect(screen.getByAltText(homeContent.portrait.alt)).toHaveAttribute(
       "src",
       expect.stringContaining("oto-native.png")
@@ -64,6 +65,19 @@ describe("Home page", () => {
       "src",
       expect.stringContaining("oto-suit-1.png")
     );
+  });
+
+  test("features the party badge in the hero and on the vote-targets plane", () => {
+    render(<HomePage />);
+    const badges = screen.getAllByAltText(siteContent.partyLogo.alt);
+    expect(badges).toHaveLength(2);
+    for (const badge of badges) {
+      expect(badge).toHaveAttribute("src", expect.stringContaining("zlp-logo.png"));
+    }
+    const hero = screen.getByRole("heading", { level: 1 }).closest("section");
+    expect(hero?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
+    const targets = screen.getByText("500,000").closest("section");
+    expect(targets?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
   });
 
   test("get involved carries the asks and the vote targets", () => {
