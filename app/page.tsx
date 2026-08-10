@@ -1,6 +1,7 @@
 import { Section } from "@/components/primitives/Section";
 import { Hero } from "@/components/sections/Hero";
 import { PedigreeBlock } from "@/components/sections/PedigreeBlock";
+import { StoryTeaser } from "@/components/sections/StoryTeaser";
 import { AtunlutoBlock } from "@/components/sections/AtunlutoBlock";
 import { AgendaLedger } from "@/components/sections/AgendaLedger";
 import { PledgeGrid } from "@/components/sections/PledgeGrid";
@@ -56,6 +57,7 @@ export default function HomePage() {
       <PlaneCut from="green" to="surface" />
       <Section id="about">
         <PedigreeBlock />
+        <StoryTeaser />
         <AtunlutoBlock />
       </Section>
       <PlaneCut from="surface" to="ink" />
