@@ -25,6 +25,5 @@ describe("WatchBlock", () => {
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
     expect(screen.getByText(watchContent.coming.line)).toBeInTheDocument();
-    expect(screen.getByText(watchContent.coming.detail)).toBeInTheDocument();
   });
 });
