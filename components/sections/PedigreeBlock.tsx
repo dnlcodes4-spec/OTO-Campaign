@@ -38,6 +38,21 @@ export function PedigreeBlock() {
           {aboutContent.abujaSupport}
         </p>
       </div>
+      {/*
+       * The brief's proof rows: what separates OTO from the name-only-business
+       * crowd. They run as a quiet two-column hairline ledger under the display
+       * answer, the same micro-row treatment the agenda items use.
+       */}
+      <ul className="mt-10 max-w-4xl divide-y divide-ink/10 border-t border-ink/10 sm:columns-2 sm:gap-10 sm:[column-fill:balance]">
+        {aboutContent.abujaRecord.map((line) => (
+          <li
+            key={line}
+            className="break-inside-avoid py-3 font-body text-sm leading-relaxed text-ink/70"
+          >
+            {line}
+          </li>
+        ))}
+      </ul>
 
       <div className="mt-16 border-t-2 border-ink pt-12 sm:mt-20 lg:mt-24 lg:pt-16">
         <Heading
@@ -105,6 +120,27 @@ export function PedigreeBlock() {
               </p>
             </div>
           ))}
+        </div>
+
+        {/*
+         * The exposure proof: the UK-Nigeria tie-ups OTO brokered, three
+         * paired names under hairline rules, closing the pedigree ledger the
+         * education rows open.
+         */}
+        <div className="mt-10 border-t-2 border-ink pt-6 sm:pt-8">
+          <p className="max-w-xl font-body text-base leading-relaxed text-ink/70">
+            {aboutContent.tieUps.lead}
+          </p>
+          <div className="mt-6 grid gap-x-10 gap-y-4 sm:grid-cols-3">
+            {aboutContent.tieUps.pairs.map((pair) => (
+              <div key={pair.uk} className="border-t border-ink/15 pt-3">
+                <p className="font-display text-lg font-semibold leading-tight">{pair.uk}</p>
+                <p className="mt-1 font-body text-sm leading-relaxed text-ink/60">
+                  with {pair.ng}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

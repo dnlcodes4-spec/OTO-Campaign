@@ -32,9 +32,15 @@ describe("Home page", () => {
     const { container } = render(<HomePage />);
     const about = getSection(container, "about");
     expect(
-      within(about).getByText(/Federal University of Technology, Minna/)
+      within(about).getAllByText(/Federal University of Technology, Minna/).length
+    ).toBeGreaterThan(0);
+    expect(
+      within(about).getAllByText(/University of Portsmouth/).length
+    ).toBeGreaterThan(0);
+    expect(
+      within(about).getByText(/He has businesses across states/)
     ).toBeInTheDocument();
-    expect(within(about).getByText(/University of Portsmouth/)).toBeInTheDocument();
+    expect(within(about).getByText("Cranfield University")).toBeInTheDocument();
   });
 
   test("about features the Atunluto structure inside its plane", () => {
