@@ -1,16 +1,18 @@
 import { Heading } from "@/components/primitives/Heading";
 import {
   FederatingZones,
+  Institutions,
   Residency,
   SecularState,
   StatePolice,
+  WarrantyLaws,
   type PictogramProps,
 } from "@/components/graphics";
 import { agendaContent, type AgendaItem } from "@/content/agenda";
 
 /*
  * The legislative agenda is the meat of the page, so it gets the darkest
- * plane and the heaviest ledger. Each of the four items is a full-width row
+ * plane and the heaviest ledger. Each of the six items is a full-width row
  * under a hairline rule: an oversized gold numeral (the campaign's own docx
  * sets its sections with big numerals), the title at display scale, a thesis,
  * then the working detail as hairline micro-rows. The state police item
@@ -28,6 +30,8 @@ const PICTOGRAMS: Record<string, (props: PictogramProps) => React.ReactNode> = {
   "2": Residency,
   "3": SecularState,
   "4": FederatingZones,
+  "5": WarrantyLaws,
+  "6": Institutions,
 };
 
 function AgendaItemRow({ item }: { item: AgendaItem }) {

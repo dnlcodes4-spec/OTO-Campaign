@@ -48,7 +48,7 @@ describe("Home page", () => {
     ).toHaveAttribute("href", "https://www.atunlutogroup.org");
   });
 
-  test("agenda carries the four legislative items", () => {
+  test("agenda carries the six legislative items", () => {
     const { container } = render(<HomePage />);
     const agenda = getSection(container, "agenda");
     expect(
@@ -59,6 +59,14 @@ describe("Home page", () => {
     ).toBeInTheDocument();
     expect(
       within(agenda).getByRole("heading", { name: "Redraft the Civil Defence law" })
+    ).toBeInTheDocument();
+    expect(
+      within(agenda).getByRole("heading", { name: "Warranty laws with teeth" })
+    ).toBeInTheDocument();
+    expect(
+      within(agenda).getByRole("heading", {
+        name: "Institutions that answer to the constitution",
+      })
     ).toBeInTheDocument();
   });
 

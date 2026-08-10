@@ -3,13 +3,15 @@ import { render, screen } from "@testing-library/react";
 import { AgendaLedger } from "./AgendaLedger";
 
 describe("AgendaLedger", () => {
-  test("draws a custom pictogram for each of the four legislative items", () => {
+  test("draws a custom pictogram for each of the six legislative items", () => {
     render(<AgendaLedger />);
     for (const id of [
       "pictogram-state-police",
       "pictogram-residency",
       "pictogram-secular-state",
       "pictogram-federating-zones",
+      "pictogram-warranty-laws",
+      "pictogram-institutions",
     ]) {
       expect(screen.getByTestId(id)).toBeInTheDocument();
     }
@@ -22,6 +24,8 @@ describe("AgendaLedger", () => {
       "pictogram-residency",
       "pictogram-secular-state",
       "pictogram-federating-zones",
+      "pictogram-warranty-laws",
+      "pictogram-institutions",
     ]) {
       const svg = screen.getByTestId(id);
       expect(svg).toHaveAttribute("aria-hidden", "true");

@@ -15,6 +15,8 @@ export { StatePolice } from "./StatePolice";
 export { Residency } from "./Residency";
 export { SecularState } from "./SecularState";
 export { FederatingZones } from "./FederatingZones";
+export { WarrantyLaws } from "./WarrantyLaws";
+export { Institutions } from "./Institutions";
 
 /*
  * The social marks are the second family in here: the platforms'
