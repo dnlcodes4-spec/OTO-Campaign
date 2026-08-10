@@ -9,6 +9,7 @@ import { SocialLinks } from "./SocialLinks";
 
 const LINKS = [
   { href: "/#about", label: "About" },
+  { href: "/story", label: "Story" },
   { href: "/#agenda", label: "Agenda" },
   { href: "/#get-involved", label: "Get Involved" },
   { href: "/gallery", label: "Gallery" },
