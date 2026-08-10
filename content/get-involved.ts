@@ -21,7 +21,7 @@ export const getInvolvedContent = {
       label: "registered voters in Oyo State, more or less.",
     },
     {
-      figure: "1 in 3",
+      figure: "1 in 4",
       label: "is all that consistently shows up.",
     },
   ] as TurnoutStat[],
@@ -36,7 +36,7 @@ export const getInvolvedContent = {
       number: "1",
       title: "Make up your mind",
       detail:
-        "Vote for the Zenith Labour Party across the board in the election, and for OTO as your senator.",
+        "Vote for the Zenith Labour Party across the board in the 2027 election, and for OTO as your senator.",
     },
     {
       number: "2",
@@ -48,7 +48,7 @@ export const getInvolvedContent = {
       number: "3",
       title: "Volunteer on the trail",
       detail:
-        "Sponsor a mini rally in your area, download and print posters and fliers for your neighborhood, and stand as a polling-unit volunteer on election day.",
+        "Volunteer to help out during the campaign and at the polling units on election day. We need a sea of volunteers.",
     },
     {
       number: "4",
@@ -66,13 +66,11 @@ export const getInvolvedContent = {
   targets: [
     {
       figure: "1,000,000",
-      label: "votes for the Zenith Labour Party in the Presidential election.",
-    },
-    {
-      figure: "500,000",
-      label: "votes for the Zenith Labour Party in the Oyo South Senatorial District race.",
+      label: "votes for the Zenith Labour Party at the Oyo South Senatorial District.",
     },
   ] as VoteTarget[],
+  targetsSupport:
+    "No matter how bad it gets, from this target there is enough to win it.",
   epigraph:
     "…and when they heard of it, it grieved them exceedingly that there was come a man to seek the welfare of the children of Oyo South Senatorial District",
 };

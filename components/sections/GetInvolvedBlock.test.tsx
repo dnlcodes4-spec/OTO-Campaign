@@ -17,7 +17,7 @@ describe("GetInvolvedBlock", () => {
 
   test("keeps the turnout figures faithful to the registration and participation facts", () => {
     const figures = getInvolvedContent.turnoutStats.map((stat) => stat.figure);
-    expect(figures).toEqual(["4,000,000", "1 in 3"]);
+    expect(figures).toEqual(["4,000,000", "1 in 4"]);
     expect(getInvolvedContent.turnoutStats[0].label).toMatch(
       /registered voters in Oyo State/
     );

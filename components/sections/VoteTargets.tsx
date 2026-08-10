@@ -3,20 +3,20 @@ import { getInvolvedContent } from "@/content/get-involved";
 import { siteContent } from "@/content/site";
 
 /*
- * The page ends the way the campaign document does: with the count. Two
- * poster-scale gold figures on the deep green plane that runs on into the
- * footer, the second stepped to the right so the eye descends the same
- * diagonal the section cuts draw. Under them, the campaign line, the verse
- * the whole campaign takes its name from, closes the page quietly.
+ * The page ends the way the campaign document does: with the count. The
+ * revised brief asks for one number only, a million votes at Oyo South, so
+ * a single poster-scale gold figure holds the deep green plane that runs on
+ * into the footer, with the brief's own resolve line under it. Then the
+ * campaign line, the verse the whole campaign takes its name from, closes
+ * the page quietly.
  *
- * Both counts are votes for the Zenith Labour Party, so the party badge
- * heads the plane at its largest size on the site, the letterhead over the
- * ledger. On lg it sits opposite the lead line, top right where the first
- * numeral is left, opening the same right-left-right descent the stepped
- * figures draw. Below lg it takes the top of the plane alone, right
- * aligned on the same edge, before the lead line and the count. The white
- * card sits directly on the deep green plane with its own rounded edge,
- * the identical treatment the badge gets in the hero and footer.
+ * The count is votes for the Zenith Labour Party, so the party badge heads
+ * the plane at its largest size on the site, the letterhead over the
+ * ledger. On lg it sits opposite the lead line, top right against the
+ * numeral's left edge below. Below lg it takes the top of the plane alone,
+ * right aligned on the same edge, before the lead line and the count. The
+ * white card sits directly on the deep green plane with its own rounded
+ * edge, the identical treatment the badge gets in the hero and footer.
  */
 export function VoteTargets() {
   return (
@@ -34,26 +34,20 @@ export function VoteTargets() {
         </p>
       </div>
       <div className="mt-10 flex flex-col gap-10 lg:mt-14 lg:gap-14">
-        {getInvolvedContent.targets.map((target, index) => (
-          <div
-            key={target.figure}
-            className={`border-t border-ink-inverse/20 pt-6 lg:w-4/5 ${
-              index % 2 === 1 ? "lg:ml-auto lg:text-right" : ""
-            }`}
-          >
+        {getInvolvedContent.targets.map((target) => (
+          <div key={target.figure} className="border-t border-ink-inverse/20 pt-6 lg:w-4/5">
             <p className="font-display text-6xl font-semibold leading-none tracking-tight text-brand-gold sm:text-7xl lg:text-9xl">
               {target.figure}
             </p>
-            <p
-              className={`mt-3 max-w-xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg ${
-                index % 2 === 1 ? "lg:ml-auto" : ""
-              }`}
-            >
+            <p className="mt-3 max-w-xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg">
               {target.label}
             </p>
           </div>
         ))}
       </div>
+      <p className="mt-6 max-w-xl font-body text-base leading-relaxed text-ink-inverse/60">
+        {getInvolvedContent.targetsSupport}
+      </p>
       <p className="mt-16 max-w-3xl font-display text-xl font-medium leading-snug text-ink-inverse/60 sm:text-2xl lg:mt-24">
         &ldquo;{getInvolvedContent.epigraph}&rdquo;
       </p>

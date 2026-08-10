@@ -102,7 +102,7 @@ describe("Home page", () => {
     }
     const hero = screen.getByRole("heading", { level: 1 }).closest("section");
     expect(hero?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
-    const targets = screen.getByText("500,000").closest("section");
+    const targets = screen.getByText("1,000,000").closest("section");
     expect(targets?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
   });
 
@@ -119,11 +119,15 @@ describe("Home page", () => {
     expect(watch.querySelector("img")).toBeNull();
   });
 
-  test("get involved carries the asks and the vote targets", () => {
+  test("get involved carries the asks and the single vote target", () => {
     const { container } = render(<HomePage />);
     const getInvolved = getSection(container, "get-involved");
     expect(within(getInvolved).getByText(/at least ten more/)).toBeInTheDocument();
+    expect(within(getInvolved).getByText(/the 2027 election/)).toBeInTheDocument();
     expect(screen.getByText("1,000,000")).toBeInTheDocument();
-    expect(screen.getByText("500,000")).toBeInTheDocument();
+    expect(screen.queryByText("500,000")).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/from this target there is enough to win it/)
+    ).toBeInTheDocument();
   });
 });
