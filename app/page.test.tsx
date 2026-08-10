@@ -44,8 +44,8 @@ describe("Home page", () => {
       within(about).getByText(/Atunluto caucus within the Zenith Labour Party/)
     ).toBeInTheDocument();
     expect(
-      within(about).getByRole("link", { name: /atunlutogroup\.org/ })
-    ).toHaveAttribute("href", "https://www.atunlutogroup.org");
+      within(about).getByRole("link", { name: /atunluto\.com/ })
+    ).toHaveAttribute("href", "https://www.atunluto.com");
   });
 
   test("agenda carries the six legislative items", () => {

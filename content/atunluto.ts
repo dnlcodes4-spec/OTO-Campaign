@@ -16,7 +16,7 @@ export type ProgrammeGroup = {
 export const atunlutoContent = {
   answer: "He is not promising one. He already built it.",
   caucusLine:
-    "OTO comes to this race from the Atunluto caucus within the Zenith Labour Party: the Atunluto Group, a grassroots political association founded in Oyo State in March 2024 and focused on the Oyo South Senatorial District.",
+    "OTO comes to this race from the Atunluto caucus within the Zenith Labour Party: the Atunluto Group, a grassroots political association founded in Oyo State in March 2024 and focused on the Oyo South Senatorial District. Built as a resilient structure since then, it has grown into a major caucus in the Oyo Zenith Labour Party.",
   model:
     "It practises cooperative politics. Members fund and own the structure the way a cooperative thrift works, sponsor candidates from their own ranks, and keep the power to remove them if they underperform.",
   stats: [
@@ -49,7 +49,7 @@ export const atunlutoContent = {
     ],
   } as ProgrammeGroup,
   link: {
-    href: "https://www.atunlutogroup.org",
-    label: "atunlutogroup.org",
+    href: "https://www.atunluto.com",
+    label: "atunluto.com",
   },
 };

@@ -57,7 +57,6 @@ export const agendaContent = {
         "Anyone who has lived an entire lifetime in a state can claim legal residency there and every benefit that accrues to indigenes.",
         "Their children become naturalized indigenes of that state by virtue of birth.",
         "Eases ethnic tension, engenders patriotism, and turns residents into contributors: if everyone living in Oyo State paid their taxes into Oyo State, the state would be markedly better off.",
-        "Fixes the census. People get counted where they actually live and draw resources, not where they travel back to, so allocations and planning stop being distorted.",
       ],
     },
     {

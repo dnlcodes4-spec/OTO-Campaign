@@ -13,8 +13,8 @@ describe("AtunlutoBlock", () => {
 
   test("links out to the group's own site in a new tab", () => {
     render(<AtunlutoBlock />);
-    const link = screen.getByRole("link", { name: /atunlutogroup\.org/ });
-    expect(link).toHaveAttribute("href", "https://www.atunlutogroup.org");
+    const link = screen.getByRole("link", { name: /atunluto\.com/ });
+    expect(link).toHaveAttribute("href", "https://www.atunluto.com");
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
