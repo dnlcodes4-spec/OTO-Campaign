@@ -4,6 +4,7 @@ import { PedigreeBlock } from "@/components/sections/PedigreeBlock";
 import { AtunlutoBlock } from "@/components/sections/AtunlutoBlock";
 import { AgendaLedger } from "@/components/sections/AgendaLedger";
 import { PledgeGrid } from "@/components/sections/PledgeGrid";
+import { SenatorJob } from "@/components/sections/SenatorJob";
 import { WatchBlock } from "@/components/sections/WatchBlock";
 import { GetInvolvedBlock } from "@/components/sections/GetInvolvedBlock";
 import { VoteTargets } from "@/components/sections/VoteTargets";
@@ -64,6 +65,7 @@ export default function HomePage() {
       <PlaneCut from="ink" to="surface" />
       <Section>
         <PledgeGrid />
+        <SenatorJob />
       </Section>
       {/*
        * The film plane: the written case is complete, so the candidate makes
