@@ -11,7 +11,7 @@ vi.mock("@/lib/admin/authorize", () => ({
   isOtoAdmin: (id: string) => isOtoAdminMock(id),
 }));
 
-import { middleware } from "./middleware";
+import { proxy } from "./proxy";
 
 beforeEach(() => {
   getUserMock.mockReset();
@@ -22,7 +22,7 @@ beforeEach(() => {
 
 test("redirects an unauthenticated visitor away from a protected admin route", async () => {
   getUserMock.mockResolvedValue({ data: { user: null } });
-  const response = await middleware(new NextRequest("http://localhost/admin/admins"));
+  const response = await proxy(new NextRequest("http://localhost/admin/admins"));
   expect(response.status).toBe(307);
   expect(response.headers.get("location")).toBe("http://localhost/admin/login");
 });
@@ -30,14 +30,14 @@ test("redirects an unauthenticated visitor away from a protected admin route", a
 test("lets a logged-in oto_admin through to a protected route", async () => {
   getUserMock.mockResolvedValue({ data: { user: { id: "user-1" } } });
   isOtoAdminMock.mockResolvedValue(true);
-  const response = await middleware(new NextRequest("http://localhost/admin/admins"));
+  const response = await proxy(new NextRequest("http://localhost/admin/admins"));
   expect(response.status).toBe(200);
 });
 
 test("redirects a logged-in non-admin away from a protected route", async () => {
   getUserMock.mockResolvedValue({ data: { user: { id: "user-9" } } });
   isOtoAdminMock.mockResolvedValue(false);
-  const response = await middleware(new NextRequest("http://localhost/admin/admins"));
+  const response = await proxy(new NextRequest("http://localhost/admin/admins"));
   expect(response.status).toBe(307);
   expect(response.headers.get("location")).toBe("http://localhost/admin/login");
 });
@@ -45,19 +45,19 @@ test("redirects a logged-in non-admin away from a protected route", async () => 
 test("redirects an already-authorized admin away from the login page", async () => {
   getUserMock.mockResolvedValue({ data: { user: { id: "user-1" } } });
   isOtoAdminMock.mockResolvedValue(true);
-  const response = await middleware(new NextRequest("http://localhost/admin/login"));
+  const response = await proxy(new NextRequest("http://localhost/admin/login"));
   expect(response.status).toBe(307);
   expect(response.headers.get("location")).toBe("http://localhost/admin");
 });
 
 test("lets an unauthenticated visitor reach the login page", async () => {
   getUserMock.mockResolvedValue({ data: { user: null } });
-  const response = await middleware(new NextRequest("http://localhost/admin/login"));
+  const response = await proxy(new NextRequest("http://localhost/admin/login"));
   expect(response.status).toBe(200);
 });
 
 test("does not touch requests outside /admin", async () => {
-  const response = await middleware(new NextRequest("http://localhost/gallery"));
+  const response = await proxy(new NextRequest("http://localhost/gallery"));
   expect(response.status).toBe(200);
   expect(getUserMock).not.toHaveBeenCalled();
 });
