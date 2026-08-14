@@ -60,7 +60,15 @@ export async function POST(request: Request) {
   });
 
   if (insertError) {
-    await adminClient.auth.admin.deleteUser(createdUser.user.id);
+    const { error: rollbackError } = await adminClient.auth.admin.deleteUser(
+      createdUser.user.id
+    );
+    if (rollbackError) {
+      console.error(
+        `Failed to roll back auth user ${createdUser.user.id} after oto_admins insert failure:`,
+        rollbackError
+      );
+    }
     return NextResponse.json({ error: insertError.message }, { status: 500 });
   }
 

@@ -110,6 +110,7 @@ test("POST rolls back the auth user if the oto_admins insert fails", async () =>
   authorizeAdminRequestMock.mockResolvedValue({ authorized: true, actingAdminId: "user-1" });
   createUserMock.mockResolvedValue({ data: { user: { id: "new-user" } }, error: null });
   insertMock.mockResolvedValue({ error: new Error("duplicate email") });
+  deleteUserMock.mockResolvedValue({ error: null });
 
   const response = await POST(
     new Request("http://localhost/api/admin/admins", {
@@ -120,4 +121,29 @@ test("POST rolls back the auth user if the oto_admins insert fails", async () =>
 
   expect(response.status).toBe(500);
   expect(deleteUserMock).toHaveBeenCalledWith("new-user");
+});
+
+test("POST logs an error if the rollback fails", async () => {
+  authorizeAdminRequestMock.mockResolvedValue({ authorized: true, actingAdminId: "user-1" });
+  createUserMock.mockResolvedValue({ data: { user: { id: "new-user" } }, error: null });
+  insertMock.mockResolvedValue({ error: new Error("duplicate email") });
+  deleteUserMock.mockResolvedValue({ error: new Error("rollback failed") });
+
+  const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+  const response = await POST(
+    new Request("http://localhost/api/admin/admins", {
+      method: "POST",
+      body: JSON.stringify({ email: "new@b.com", password: "strong-pass" }),
+    })
+  );
+
+  expect(response.status).toBe(500);
+  expect(deleteUserMock).toHaveBeenCalledWith("new-user");
+  expect(consoleErrorSpy).toHaveBeenCalled();
+  const errorCall = consoleErrorSpy.mock.calls[0];
+  expect(errorCall[0]).toMatch(/Failed to roll back auth user new-user/);
+  expect(errorCall[1]).toEqual(new Error("rollback failed"));
+
+  consoleErrorSpy.mockRestore();
 });
