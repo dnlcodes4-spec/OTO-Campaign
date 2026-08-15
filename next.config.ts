@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   // pipeline expects the default output and fails on standalone traces.
   output: process.env.VERCEL ? undefined : "standalone",
   images: {
+    // Gallery photos never change once uploaded (a caption edit doesn't
+    // touch the file), so the optimizer's cache can be held far longer
+    // than the framework default without ever serving a stale image.
+    minimumCacheTTL: 2592000,
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
