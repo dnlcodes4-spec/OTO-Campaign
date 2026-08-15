@@ -39,7 +39,7 @@ export function AdminsManager({ extraHeaders = {} }: AdminsManagerProps) {
   }, []);
 
   useEffect(() => {
-    loadAdmins();
+    queueMicrotask(loadAdmins);
   }, [loadAdmins]);
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
