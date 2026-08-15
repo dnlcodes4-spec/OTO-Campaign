@@ -1,11 +1,12 @@
-import { beforeEach, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 const orderMock = vi.fn();
 const selectMock = vi.fn(() => ({ order: orderMock }));
 const fromMock = vi.fn(() => ({ select: selectMock }));
+const createClientMock = vi.fn(async () => ({ from: fromMock }));
 
 vi.mock("@/lib/supabase/server", () => ({
-  createClient: async () => ({ from: fromMock }),
+  createClient: () => createClientMock(),
 }));
 
 vi.mock("@/lib/cloudinary", () => ({
@@ -19,11 +20,39 @@ beforeEach(() => {
   orderMock.mockReset();
   selectMock.mockClear();
   fromMock.mockClear();
+  createClientMock.mockReset();
+  createClientMock.mockImplementation(async () => ({ from: fromMock }));
+  vi.spyOn(console, "error").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 test("returns an empty array on a query error", async () => {
   orderMock.mockResolvedValue({ data: null, error: new Error("db down") });
   await expect(getGalleryItems()).resolves.toEqual([]);
+});
+
+test("logs the query error server-side instead of failing silently", async () => {
+  const queryError = new Error("db down");
+  orderMock.mockResolvedValue({ data: null, error: queryError });
+  await getGalleryItems();
+  expect(console.error).toHaveBeenCalledWith(
+    expect.stringContaining("oto_gallery"),
+    queryError
+  );
+});
+
+test("catches an error thrown while creating the Supabase client and returns an empty array", async () => {
+  createClientMock.mockImplementation(async () => {
+    throw new Error("supabaseUrl is required.");
+  });
+  await expect(getGalleryItems()).resolves.toEqual([]);
+  expect(console.error).toHaveBeenCalledWith(
+    expect.stringContaining("oto_gallery"),
+    expect.any(Error)
+  );
 });
 
 test("maps image rows without a posterUrl", async () => {
