@@ -97,6 +97,18 @@ describe("authorizeAdminRequest", () => {
     expect(result).toEqual({ authorized: false });
   });
 
+  test("rejects an anonymous request with a setup key of same length but different content", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } });
+    process.env.ADMIN_SETUP_ENABLED = "true";
+    process.env.ADMIN_SETUP_KEY = "correct-key";
+    const result = await authorizeAdminRequest(
+      new Request("http://localhost/api/admin/admins", {
+        headers: { "x-admin-setup-key": "wrong-key-x" },
+      })
+    );
+    expect(result).toEqual({ authorized: false });
+  });
+
   test("rejects an anonymous request when setup is not enabled", async () => {
     getUserMock.mockResolvedValue({ data: { user: null } });
     const result = await authorizeAdminRequest(new Request("http://localhost/api/admin/admins"));
