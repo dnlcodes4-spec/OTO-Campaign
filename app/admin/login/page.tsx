@@ -16,28 +16,40 @@ export default function AdminLoginPage() {
     event.preventDefault();
     setSubmitting(true);
     setErrorMessage("");
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setSubmitting(false);
-      setErrorMessage("Incorrect email or password.");
-      return;
-    }
 
-    /*
-     * A valid Supabase session is not the same as admin access: this project
-     * is shared with the Atunluto campaign site, so any of their users can
-     * sign in here successfully. Without this probe they would be bounced
-     * straight back to this form by the proxy with nothing on screen -
-     * indistinguishable from the click never registering. GET
-     * /api/admin/admins already runs authorizeAdminRequest and answers 401
-     * for a non-oto_admins session, so it doubles as the membership check.
-     */
-    const membershipCheck = await fetch("/api/admin/admins");
-    if (!membershipCheck.ok) {
-      await supabase.auth.signOut();
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setSubmitting(false);
+        setErrorMessage("Incorrect email or password.");
+        return;
+      }
+
+      /*
+       * A valid Supabase session is not the same as admin access: this project
+       * is shared with the Atunluto campaign site, so any of their users can
+       * sign in here successfully. Without this probe they would be bounced
+       * straight back to this form by the proxy with nothing on screen -
+       * indistinguishable from the click never registering. GET
+       * /api/admin/admins already runs authorizeAdminRequest and answers 401
+       * for a non-oto_admins session, so it doubles as the membership check.
+       */
+      const membershipCheck = await fetch("/api/admin/admins");
+      if (!membershipCheck.ok) {
+        await supabase.auth.signOut();
+        setSubmitting(false);
+        setErrorMessage("This account does not have admin access.");
+        return;
+      }
+    } catch (error) {
+      // createClient() (a malformed env var) or either network call can
+      // throw outright rather than resolve with an `error` field. Without
+      // this catch the button stayed on "Signing in..." forever with no
+      // way to tell what happened, and no request ever left the browser.
+      console.error("Admin sign-in failed:", error);
       setSubmitting(false);
-      setErrorMessage("This account does not have admin access.");
+      setErrorMessage("Something went wrong. Please try again.");
       return;
     }
 
