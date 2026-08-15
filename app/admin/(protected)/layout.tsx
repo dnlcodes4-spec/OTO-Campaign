@@ -22,6 +22,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         <nav className="flex items-center gap-6 text-sm font-body">
           <Link href="/admin">Dashboard</Link>
           <Link href="/admin/admins">Admins</Link>
+          <Link href="/admin/gallery">Gallery</Link>
           <SignOutButton />
         </nav>
       </header>
