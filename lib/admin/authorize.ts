@@ -1,9 +1,18 @@
+import { timingSafeEqual } from "node:crypto";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type AdminAuthorization =
   | { authorized: true; actingAdminId: string | null }
   | { authorized: false };
+
+// Performs constant-time comparison of two strings to prevent timing attacks
+function safeEqual(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return timingSafeEqual(aBuf, bBuf);
+}
 
 export async function isOtoAdmin(userId: string): Promise<boolean> {
   const adminClient = createAdminClient();
@@ -29,7 +38,7 @@ export async function authorizeAdminRequest(request: Request): Promise<AdminAuth
   if (process.env.ADMIN_SETUP_ENABLED === "true") {
     const providedKey = request.headers.get("x-admin-setup-key");
     const expectedKey = process.env.ADMIN_SETUP_KEY;
-    if (providedKey && expectedKey && providedKey === expectedKey) {
+    if (providedKey && expectedKey && safeEqual(providedKey, expectedKey)) {
       return { authorized: true, actingAdminId: null };
     }
   }
