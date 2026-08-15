@@ -1,6 +1,9 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
-const createClientMock = vi.fn(() => ({ mocked: "client" }));
+const createClientMock = vi.fn((...args: unknown[]) => {
+  void args;
+  return { mocked: "client" };
+});
 vi.mock("@supabase/supabase-js", () => ({
   createClient: (...args: unknown[]) => createClientMock(...args),
 }));

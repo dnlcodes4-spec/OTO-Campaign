@@ -1,6 +1,9 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
-const createServerClientMock = vi.fn(() => ({ mocked: "server-client" }));
+const createServerClientMock = vi.fn((...args: unknown[]) => {
+  void args;
+  return { mocked: "server-client" };
+});
 vi.mock("@supabase/ssr", () => ({
   createServerClient: (...args: unknown[]) => createServerClientMock(...args),
 }));
@@ -29,6 +32,10 @@ test("createClient passes the publishable key and wires cookies from next/header
     "test-publishable-key",
     expect.objectContaining({ cookies: expect.any(Object) })
   );
-  const passedCookies = createServerClientMock.mock.calls[0][2].cookies;
+  const passedCookies = (
+    createServerClientMock.mock.calls[0]?.[2] as {
+      cookies: { getAll: () => unknown };
+    }
+  ).cookies;
   expect(passedCookies.getAll()).toEqual([{ name: "sb-token", value: "abc" }]);
 });
