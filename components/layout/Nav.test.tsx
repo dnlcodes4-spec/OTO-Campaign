@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import { Nav } from "./Nav";
-import { socials } from "@/content/site";
+import { siteContent, socials } from "@/content/site";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
@@ -99,6 +99,19 @@ describe("Nav", () => {
     expect(mark).not.toBeNull();
     expect(mark).toHaveAttribute("alt", "");
     expect(screen.getByRole("link", { name: "OTO" })).toHaveAttribute("href", "/");
+  });
+
+  test("carries the party badge in both the desktop cluster and the mobile bar", () => {
+    const { container } = render(<Nav />);
+    const badges = screen.getAllByAltText(siteContent.partyLogo.alt);
+    // One lives in the hidden-until-lg desktop cluster, the other in the
+    // lg:hidden mobile bar beside the menu trigger; both stay mounted at
+    // once and CSS decides which one is visible at a given breakpoint.
+    expect(badges).toHaveLength(2);
+    for (const badge of badges) {
+      expect(badge).toHaveAttribute("src", expect.stringContaining("zlp-logo.png"));
+    }
+    expect(container.querySelectorAll('img[src*="zlp-logo"]')).toHaveLength(2);
   });
 
   test("aria-controls only points at the overlay while it exists", () => {

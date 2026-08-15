@@ -182,45 +182,79 @@ export function Nav() {
             OTO
           </Link>
 
-          <nav className="hidden lg:flex lg:items-center lg:gap-8">
-            {LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`font-body text-sm font-medium ${FOCUS_RING_LIGHT_PLANE} ${
-                  isActive(pathname, link.href)
-                    ? "text-brand-red"
-                    : "text-ink hover:text-brand-green"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          <div className="hidden items-center gap-8 lg:flex">
+            <nav className="flex items-center gap-8">
+              {LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`font-body text-sm font-medium ${FOCUS_RING_LIGHT_PLANE} ${
+                    isActive(pathname, link.href)
+                      ? "text-brand-red"
+                      : "text-ink hover:text-brand-green"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {/*
+               * The channel marks close the bar after the destinations,
+               * separated by a hairline and sized under the text links:
+               * secondary wayfinding, not a fifth destination.
+               */}
+              <SocialLinks
+                plane="light"
+                markClassName="h-4 w-4"
+                className="gap-4 border-l border-ink/15 pl-8"
+              />
+            </nav>
             {/*
-             * The channel marks close the bar after the destinations,
-             * separated by a hairline and sized under the text links:
-             * secondary wayfinding, not a fifth destination.
+             * The party endorsement mark closes the bar on its own, past
+             * the channel marks: the badge is the party's official card
+             * and stays a plain image, not a link, matching how it
+             * appears everywhere else on the site. The header plane sits
+             * at bg-surface, close to the badge's own white card, so a
+             * drop-shadow (not a border, which would fight the image's
+             * baked-in corner radius) is what keeps it legible instead
+             * of washing out.
              */}
-            <SocialLinks
-              plane="light"
-              markClassName="h-4 w-4"
-              className="gap-4 border-l border-ink/15 pl-8"
+            <Image
+              src={siteContent.partyLogo.src}
+              alt={siteContent.partyLogo.alt}
+              width={93}
+              height={80}
+              className="h-8 w-auto shrink-0 border-l border-ink/15 pl-8 drop-shadow-sm"
             />
-          </nav>
+          </div>
 
-          <button
-            ref={openButtonRef}
-            type="button"
-            className={`flex flex-col gap-1.5 lg:hidden ${FOCUS_RING_LIGHT_PLANE}`}
-            aria-label="Open menu"
-            aria-expanded={open}
-            {...(open ? { "aria-controls": "mobile-menu" } : {})}
-            onClick={() => setOpen(true)}
-          >
-            <span className="h-0.5 w-6 bg-ink" />
-            <span className="h-0.5 w-6 bg-ink" />
-            <span className="h-0.5 w-6 bg-ink" />
-          </button>
+          <div className="flex items-center gap-4 lg:hidden">
+            {/*
+             * Compact companion to the desktop badge: same endorsement
+             * mark, scaled down to sit beside the menu trigger without
+             * competing with its tap target, which stays the true corner
+             * control.
+             */}
+            <Image
+              src={siteContent.partyLogo.src}
+              alt={siteContent.partyLogo.alt}
+              width={93}
+              height={80}
+              className="h-7 w-auto shrink-0 drop-shadow-sm"
+            />
+            <button
+              ref={openButtonRef}
+              type="button"
+              className={`flex flex-col gap-1.5 ${FOCUS_RING_LIGHT_PLANE}`}
+              aria-label="Open menu"
+              aria-expanded={open}
+              {...(open ? { "aria-controls": "mobile-menu" } : {})}
+              onClick={() => setOpen(true)}
+            >
+              <span className="h-0.5 w-6 bg-ink" />
+              <span className="h-0.5 w-6 bg-ink" />
+              <span className="h-0.5 w-6 bg-ink" />
+            </button>
+          </div>
         </div>
       </div>
 
