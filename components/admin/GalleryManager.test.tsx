@@ -38,10 +38,25 @@ test("shows the load error when the list request fails", async () => {
   expect(await screen.findByRole("alert")).toHaveTextContent("Unauthorized");
 });
 
-test("uploads a file: signs, uploads to Cloudinary, creates the row, then reloads", async () => {
+test("uploads a file: signs, uploads to Cloudinary, creates the row, then appends the new item locally", async () => {
   const fetchMock = vi.fn((url: string, init?: RequestInit) => {
     if (url === "/api/admin/gallery" && (!init || init.method === undefined)) {
-      return Promise.resolve({ ok: true, json: async () => ({ items: [] }) });
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          items: [
+            {
+              id: "1",
+              media_type: "image",
+              url: "https://x/old.jpg",
+              duration_seconds: null,
+              caption: "Existing rally photo",
+              storage_path: "oto-gallery/old",
+              created_at: "2026-01-01",
+            },
+          ],
+        }),
+      });
     }
     if (url === "/api/admin/gallery/sign") {
       return Promise.resolve({
@@ -65,14 +80,27 @@ test("uploads a file: signs, uploads to Cloudinary, creates the row, then reload
       });
     }
     if (url === "/api/admin/gallery" && init?.method === "POST") {
-      return Promise.resolve({ ok: true, json: async () => ({ item: { id: "2" } }) });
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          item: {
+            id: "2",
+            media_type: "image",
+            url: "https://res.cloudinary.com/test-cloud/image/upload/oto-gallery/photo.jpg",
+            duration_seconds: null,
+            caption: "Campaign stop",
+            storage_path: "oto-gallery/photo",
+            created_at: "2026-02-01",
+          },
+        }),
+      });
     }
     return Promise.reject(new Error(`Unhandled fetch: ${url}`));
   });
   global.fetch = fetchMock as unknown as typeof fetch;
 
   render(<GalleryManager />);
-  await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+  await screen.findByText("Existing rally photo");
 
   const file = new File(["fake-image-bytes"], "photo.jpg", { type: "image/jpeg" });
   fireEvent.change(screen.getByLabelText("Photo or video"), { target: { files: [file] } });
@@ -95,6 +123,12 @@ test("uploads a file: signs, uploads to Cloudinary, creates the row, then reload
     mediaType: "image",
     caption: "Campaign stop",
   });
+
+  await screen.findByText("Campaign stop");
+  const listItems = screen.getAllByRole("listitem");
+  expect(listItems).toHaveLength(2);
+  expect(listItems[0]).toHaveTextContent("Campaign stop");
+  expect(listItems[1]).toHaveTextContent("Existing rally photo");
 });
 
 test("does not delete when the confirmation is cancelled", async () => {

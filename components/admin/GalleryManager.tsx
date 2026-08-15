@@ -114,7 +114,7 @@ export function GalleryManager({ extraHeaders = {} }: GalleryManagerProps) {
       setFile(null);
       setCaption("");
       if (createdBody.item) {
-        setItems((previous) => [...previous, createdBody.item as GalleryRecord]);
+        setItems((previous) => [createdBody.item as GalleryRecord, ...previous]);
       }
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Upload failed");
