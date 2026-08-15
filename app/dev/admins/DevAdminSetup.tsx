@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AdminsManager } from "@/components/admin/AdminsManager";
+import { ToastProvider } from "@/components/admin/ToastProvider";
 
 export function DevAdminSetup() {
   const [setupKey, setSetupKey] = useState("");
@@ -36,5 +37,9 @@ export function DevAdminSetup() {
     );
   }
 
-  return <AdminsManager extraHeaders={{ "x-admin-setup-key": setupKey }} />;
+  return (
+    <ToastProvider>
+      <AdminsManager extraHeaders={{ "x-admin-setup-key": setupKey }} />
+    </ToastProvider>
+  );
 }
