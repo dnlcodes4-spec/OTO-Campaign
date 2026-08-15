@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { clashDisplay, switzer } from "./fonts";
-import { Nav } from "@/components/layout/Nav";
-import { Footer } from "@/components/layout/Footer";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -28,6 +26,13 @@ export const metadata: Metadata = {
   },
 };
 
+/*
+ * The root layout owns only the document shell: <html>, the fonts, the
+ * global stylesheet and the default metadata. The public site's Nav/Footer
+ * chrome lives in app/(site)/layout.tsx, so that /admin/* and /dev/* -
+ * which render their own <main> - do not inherit a second landmark or the
+ * campaign navigation.
+ */
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -35,9 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${clashDisplay.variable} ${switzer.variable} h-full motion-safe:scroll-smooth`}
     >
       <body className="flex min-h-full flex-col bg-surface font-body text-ink antialiased">
-        <Nav />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );
