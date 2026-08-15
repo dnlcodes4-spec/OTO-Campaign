@@ -12,11 +12,15 @@ vi.mock("./DevAdminSetup", () => ({
   DevAdminSetup: () => <div data-testid="dev-admin-setup" />,
 }));
 
-import DevAdminsPage from "./page";
+import DevAdminsPage, { dynamic } from "./page";
 
 beforeEach(() => {
   notFoundMock.mockClear();
   delete process.env.ADMIN_SETUP_ENABLED;
+});
+
+test("opts out of static prerendering so the runtime env var is read per request", () => {
+  expect(dynamic).toBe("force-dynamic");
 });
 
 test("calls notFound when setup is not enabled", () => {
