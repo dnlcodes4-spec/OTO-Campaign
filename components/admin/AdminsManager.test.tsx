@@ -4,6 +4,9 @@ import { AdminsManager } from "./AdminsManager";
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  // jsdom's window.confirm throws "not implemented"; the delete path always
+  // goes through it, so every test needs it stubbed.
+  vi.spyOn(window, "confirm").mockReturnValue(true);
 });
 
 test("loads and displays the admin list on mount", async () => {
@@ -79,6 +82,28 @@ test("deletes an admin when Delete is clicked", async () => {
   await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
   expect(fetchMock.mock.calls[1][0]).toBe("/api/admin/admins/1");
   expect(fetchMock.mock.calls[1][1].method).toBe("DELETE");
+});
+
+test("does not delete when the confirmation is dismissed", async () => {
+  vi.spyOn(window, "confirm").mockReturnValue(false);
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      admins: [{ id: "1", email: "a@b.com", display_name: "Ada", created_at: "2026-01-01" }],
+    }),
+  });
+  global.fetch = fetchMock as unknown as typeof fetch;
+
+  render(<AdminsManager />);
+  await screen.findByText("Ada");
+  await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+  fireEvent.click(screen.getByText("Delete"));
+
+  // Only the initial GET on mount; the DELETE never fired.
+  await waitFor(() => expect(window.confirm).toHaveBeenCalled());
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+  expect(fetchMock.mock.calls[0][0]).toBe("/api/admin/admins");
 });
 
 test("attaches extraHeaders to every request", async () => {

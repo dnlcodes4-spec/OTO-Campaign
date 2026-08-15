@@ -11,6 +11,24 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
   const { id } = await params;
   const adminClient = createAdminClient();
 
+  /*
+   * Deleting the final admin would leave the console permanently
+   * unreachable: there would be no session that can pass isOtoAdmin, and
+   * /dev/admins is gated behind a runtime env var the operator may no
+   * longer be able to flip. Refuse rather than hand out a self-lockout.
+   */
+  const { count, error: countError } = await adminClient
+    .from("oto_admins")
+    .select("id", { count: "exact", head: true });
+
+  if (countError) {
+    return NextResponse.json({ error: countError.message }, { status: 500 });
+  }
+
+  if ((count ?? 0) <= 1) {
+    return NextResponse.json({ error: "Cannot delete the last remaining admin" }, { status: 400 });
+  }
+
   const { error: deleteRowError } = await adminClient.from("oto_admins").delete().eq("id", id);
   if (deleteRowError) {
     return NextResponse.json({ error: deleteRowError.message }, { status: 500 });

@@ -64,6 +64,12 @@ export function AdminsManager({ extraHeaders = {} }: AdminsManagerProps) {
   }
 
   async function handleDelete(id: string) {
+    // Deleting an admin destroys the auth user too - there is no undo, and
+    // the row sits one careless click away from every other row in the list.
+    if (!window.confirm("Delete this admin? This cannot be undone.")) {
+      return;
+    }
+
     const response = await fetch(`/api/admin/admins/${id}`, {
       method: "DELETE",
       headers: extraHeaders,
