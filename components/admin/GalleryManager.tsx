@@ -201,10 +201,28 @@ export function GalleryManager({ extraHeaders = {} }: GalleryManagerProps) {
   return (
     <div className="flex flex-col gap-8">
       <form onSubmit={handleUpload} className="flex max-w-md flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm font-body">
-          Photo or video
-          <input type="file" accept="image/*,video/*" onChange={handleFileChange} />
-        </label>
+        <div className="flex flex-col gap-1 text-sm font-body">
+          <span>Photo or video</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <label
+              htmlFor="gallery-file-input"
+              className="inline-block cursor-pointer border border-ink/20 px-4 py-2 font-body text-sm font-medium text-ink transition-colors hover:border-ink/40"
+            >
+              Choose file
+            </label>
+            <span className="font-body text-sm text-ink/60">
+              {file ? file.name : "No file chosen"}
+            </span>
+          </div>
+          <input
+            id="gallery-file-input"
+            type="file"
+            accept="image/*,video/*"
+            onChange={handleFileChange}
+            aria-label="Photo or video"
+            className="sr-only"
+          />
+        </div>
         <label className="flex flex-col gap-1 text-sm font-body">
           Caption
           <input

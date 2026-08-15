@@ -59,6 +59,24 @@ test("loads and displays gallery items with real thumbnails on mount", async () 
   expect(screen.getByAltText("Launch")).toBeInTheDocument();
 });
 
+test("shows which file is selected, defaulting to a clear no-file message", async () => {
+  global.fetch = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ items: [] }),
+  }) as unknown as typeof fetch;
+
+  render(<GalleryManager />);
+  await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+
+  expect(screen.getByText("No file chosen")).toBeInTheDocument();
+
+  const file = new File(["fake-image-bytes"], "campaign-photo.jpg", { type: "image/jpeg" });
+  fireEvent.change(screen.getByLabelText("Photo or video"), { target: { files: [file] } });
+
+  expect(screen.getByText("campaign-photo.jpg")).toBeInTheDocument();
+  expect(screen.queryByText("No file chosen")).not.toBeInTheDocument();
+});
+
 test("shows an empty state when there are no items", async () => {
   global.fetch = vi.fn().mockResolvedValue({
     ok: true,
