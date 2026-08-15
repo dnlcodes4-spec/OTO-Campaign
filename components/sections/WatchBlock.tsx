@@ -1,5 +1,6 @@
 import { Heading } from "@/components/primitives/Heading";
 import { VideoFacade } from "./VideoFacade";
+import { VideoFacadeDirect } from "./VideoFacadeDirect";
 import { watchContent } from "@/content/watch";
 
 /*
@@ -12,17 +13,20 @@ import { watchContent } from "@/content/watch";
  * is also its cinema: poster type and gold accents read strongest there,
  * and a 16:9 frame belongs on a dark plane.
  *
- * Three states, all designed, keyed off content/watch.ts:
+ * Three states, all designed, keyed off content/watch.ts's video field:
  *
- * 1. videoId null (ships now): the held plane below, a brand-green 16:9
- *    field rising through the section's deep green on the page's diagonal,
- *    carrying the promise in poster type over a gold rule. Nothing pretends
- *    to be clickable; the plane is the composition, not an empty player.
- * 2. videoId present: VideoFacade renders the thumbnail facade with a real
- *    play control, and no YouTube JavaScript loads until it is pressed.
- * 3. Playing: the facade swaps to the youtube-nocookie.com embed.
+ * 1. video null: the held plane below, a brand-green 16:9 field rising
+ *    through the section's deep green on the page's diagonal, carrying the
+ *    promise in poster type over a gold rule. Nothing pretends to be
+ *    clickable; the plane is the composition, not an empty player.
+ * 2. video.type "youtube": VideoFacade renders the thumbnail facade with a
+ *    real play control, and no YouTube JavaScript loads until it is
+ *    pressed.
+ * 3. video.type "direct": VideoFacadeDirect renders the same facade
+ *    grammar against a self-hosted (Cloudinary) clip; play swaps it for an
+ *    inline, autoplaying <video> rather than an iframe embed.
  *
- * Swapping the real id into content/watch.ts is the entire release; this
+ * Swapping the value in content/watch.ts is the entire release; this
  * component does not change.
  */
 export function WatchBlock() {
@@ -46,8 +50,14 @@ export function WatchBlock() {
       </div>
 
       <div className="mt-10 lg:mt-14">
-        {watchContent.videoId ? (
-          <VideoFacade videoId={watchContent.videoId} title={watchContent.title} />
+        {watchContent.video?.type === "youtube" ? (
+          <VideoFacade videoId={watchContent.video.videoId} title={watchContent.title} />
+        ) : watchContent.video?.type === "direct" ? (
+          <VideoFacadeDirect
+            src={watchContent.video.src}
+            poster={watchContent.video.poster}
+            title={watchContent.title}
+          />
         ) : (
           /*
            * The held plane: the film's own title card before the film
