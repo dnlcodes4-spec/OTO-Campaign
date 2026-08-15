@@ -29,6 +29,7 @@ export function GalleryItemCard({ item }: GalleryItemCardProps) {
       ) : (
         <video
           src={item.url}
+          poster={item.posterUrl}
           className="h-full w-full object-cover"
           controls
           onError={() => setFailed(true)}

@@ -23,4 +23,18 @@ describe("GalleryItemCard", () => {
     fireEvent.error(screen.getByAltText("Rally in Ibadan"));
     expect(screen.getByText("This one did not load")).toBeInTheDocument();
   });
+
+  test("sets the poster attribute for a video with a posterUrl", () => {
+    const videoItem: GalleryItem = {
+      id: "2",
+      type: "video",
+      url: "/test-video.mp4",
+      posterUrl: "/test-poster.jpg",
+      caption: "Campaign launch",
+      createdAt: "2026-01-01",
+    };
+    const { container } = render(<GalleryItemCard item={videoItem} />);
+    const video = container.querySelector("video");
+    expect(video).toHaveAttribute("poster", "/test-poster.jpg");
+  });
 });
