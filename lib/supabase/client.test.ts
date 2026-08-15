@@ -8,12 +8,15 @@ vi.mock("@supabase/ssr", () => ({
   createBrowserClient: (...args: unknown[]) => createBrowserClientMock(...args),
 }));
 
+vi.mock("./env", () => ({
+  SUPABASE_URL: "https://example.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: "test-publishable-key",
+}));
+
 import { createClient } from "./client";
 
 beforeEach(() => {
   createBrowserClientMock.mockClear();
-  process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "test-publishable-key";
 });
 
 test("createClient passes the publishable key to createBrowserClient", () => {

@@ -12,6 +12,11 @@ vi.mock("@/lib/admin/authorize", () => ({
   isOtoAdmin: (id: string) => isOtoAdminMock(id),
 }));
 
+vi.mock("@/lib/supabase/env", () => ({
+  SUPABASE_URL: "https://example.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: "test-publishable-key",
+}));
+
 import { proxy } from "./proxy";
 
 beforeEach(() => {
@@ -20,8 +25,6 @@ beforeEach(() => {
   createServerClientMock.mockReset();
   createServerClientMock.mockImplementation(() => ({ auth: { getUser: getUserMock } }));
   vi.spyOn(console, "error").mockImplementation(() => {});
-  process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "test-publishable-key";
 });
 
 test("redirects an unauthenticated visitor away from a protected admin route", async () => {

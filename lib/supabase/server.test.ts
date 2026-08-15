@@ -13,6 +13,11 @@ vi.mock("next/headers", () => ({
   cookies: () => cookiesMock(),
 }));
 
+vi.mock("./env", () => ({
+  SUPABASE_URL: "https://example.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: "test-publishable-key",
+}));
+
 import { createClient } from "./server";
 
 beforeEach(() => {
@@ -21,8 +26,6 @@ beforeEach(() => {
     getAll: () => [{ name: "sb-token", value: "abc" }],
     set: vi.fn(),
   });
-  process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "test-publishable-key";
 });
 
 test("createClient passes the publishable key and wires cookies from next/headers", async () => {
