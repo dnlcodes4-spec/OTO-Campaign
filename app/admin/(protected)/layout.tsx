@@ -6,12 +6,25 @@ import { isOtoAdmin } from "@/lib/admin/authorize";
 import { SignOutButton } from "@/components/admin/SignOutButton";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let authorized = false;
 
-  if (!user || !(await isOtoAdmin(user.id))) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    authorized = user !== null && (await isOtoAdmin(user.id));
+  } catch (error) {
+    // A malformed Supabase client (e.g. a missing env var) throws during
+    // construction. This layout wraps the entire admin console, so a crash
+    // here would take down every /admin/* page render, not just one. Fail
+    // closed and redirect instead of letting it surface as the generic
+    // production error page.
+    console.error("Admin layout auth check failed:", error);
+    authorized = false;
+  }
+
+  if (!authorized) {
     redirect("/admin/login");
   }
 

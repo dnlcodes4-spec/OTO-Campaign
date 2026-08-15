@@ -4,15 +4,17 @@ const maybeSingleMock = vi.fn();
 const eqMock = vi.fn(() => ({ maybeSingle: maybeSingleMock }));
 const selectMock = vi.fn(() => ({ eq: eqMock }));
 const fromMock = vi.fn(() => ({ select: selectMock }));
+const createAdminClientMock = vi.fn(() => ({ from: fromMock }));
 
 vi.mock("@/lib/supabase/admin", () => ({
-  createAdminClient: () => ({ from: fromMock }),
+  createAdminClient: () => createAdminClientMock(),
 }));
 
 const getUserMock = vi.fn();
+const createServerClientMock = vi.fn(async () => ({ auth: { getUser: getUserMock } }));
 
 vi.mock("@/lib/supabase/server", () => ({
-  createClient: () => ({ auth: { getUser: getUserMock } }),
+  createClient: () => createServerClientMock(),
 }));
 
 import { authorizeAdminRequest, isOtoAdmin } from "./authorize";
@@ -22,7 +24,12 @@ beforeEach(() => {
   eqMock.mockClear();
   selectMock.mockClear();
   fromMock.mockClear();
+  createAdminClientMock.mockReset();
+  createAdminClientMock.mockImplementation(() => ({ from: fromMock }));
   getUserMock.mockReset();
+  createServerClientMock.mockReset();
+  createServerClientMock.mockImplementation(async () => ({ auth: { getUser: getUserMock } }));
+  vi.spyOn(console, "error").mockImplementation(() => {});
   delete process.env.ADMIN_SETUP_ENABLED;
   delete process.env.ADMIN_SETUP_KEY;
 });
@@ -43,6 +50,13 @@ describe("isOtoAdmin", () => {
   test("returns false on query error", async () => {
     maybeSingleMock.mockResolvedValue({ data: null, error: new Error("boom") });
     await expect(isOtoAdmin("user-3")).resolves.toBe(false);
+  });
+
+  test("fails closed (returns false) when the admin client throws instead of querying", async () => {
+    createAdminClientMock.mockImplementation(() => {
+      throw new Error("supabaseUrl is required.");
+    });
+    await expect(isOtoAdmin("user-4")).resolves.toBe(false);
   });
 });
 
@@ -111,6 +125,28 @@ describe("authorizeAdminRequest", () => {
 
   test("rejects an anonymous request when setup is not enabled", async () => {
     getUserMock.mockResolvedValue({ data: { user: null } });
+    const result = await authorizeAdminRequest(new Request("http://localhost/api/admin/admins"));
+    expect(result).toEqual({ authorized: false });
+  });
+
+  test("fails closed but still honors the setup key when the session check throws", async () => {
+    createServerClientMock.mockImplementation(async () => {
+      throw new Error("supabaseUrl is required.");
+    });
+    process.env.ADMIN_SETUP_ENABLED = "true";
+    process.env.ADMIN_SETUP_KEY = "correct-key";
+    const result = await authorizeAdminRequest(
+      new Request("http://localhost/api/admin/admins", {
+        headers: { "x-admin-setup-key": "correct-key" },
+      })
+    );
+    expect(result).toEqual({ authorized: true, actingAdminId: null });
+  });
+
+  test("rejects when the session check throws and setup is not enabled", async () => {
+    createServerClientMock.mockImplementation(async () => {
+      throw new Error("supabaseUrl is required.");
+    });
     const result = await authorizeAdminRequest(new Request("http://localhost/api/admin/admins"));
     expect(result).toEqual({ authorized: false });
   });
