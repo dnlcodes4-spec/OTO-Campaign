@@ -17,7 +17,11 @@ const nextConfig: NextConfig = {
         // Scoped to our own Cloudinary account: res.cloudinary.com is a
         // shared multi-tenant host, so an unscoped pathname would let
         // next/image proxy and re-serve any other account's assets too.
-        pathname: `/${process.env.CLOUDINARY_CLOUD_NAME}/**`,
+        // Falls back to the real cloud name (not a secret — it's visible
+        // in every image URL already) in case a hosting environment
+        // doesn't propagate custom env vars into the build step itself,
+        // only into the running app's process.
+        pathname: `/${process.env.CLOUDINARY_CLOUD_NAME ?? "dgols34tu"}/**`,
       },
     ],
   },
