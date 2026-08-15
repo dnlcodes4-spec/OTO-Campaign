@@ -29,9 +29,18 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     return NextResponse.json({ error: "Cannot delete the last remaining admin" }, { status: 400 });
   }
 
-  const { error: deleteRowError } = await adminClient.from("oto_admins").delete().eq("id", id);
+  const { data: deletedRows, error: deleteRowError } = await adminClient
+    .from("oto_admins")
+    .delete()
+    .eq("id", id)
+    .select("id");
+
   if (deleteRowError) {
     return NextResponse.json({ error: deleteRowError.message }, { status: 500 });
+  }
+
+  if (!deletedRows || deletedRows.length === 0) {
+    return NextResponse.json({ error: "Admin not found" }, { status: 404 });
   }
 
   const { error: deleteUserError } = await adminClient.auth.admin.deleteUser(id);
