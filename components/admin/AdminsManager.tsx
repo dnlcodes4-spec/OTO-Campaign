@@ -25,7 +25,6 @@ export function AdminsManager({ extraHeaders = {} }: AdminsManagerProps) {
   const [submitting, setSubmitting] = useState(false);
 
   const loadAdmins = useCallback(async () => {
-    setStatus("loading");
     const response = await fetch("/api/admin/admins", { headers: extraHeaders });
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
