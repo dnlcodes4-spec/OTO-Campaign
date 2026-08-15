@@ -18,11 +18,31 @@ export default function AdminLoginPage() {
     setErrorMessage("");
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setSubmitting(false);
     if (error) {
+      setSubmitting(false);
       setErrorMessage("Incorrect email or password.");
       return;
     }
+
+    /*
+     * A valid Supabase session is not the same as admin access: this project
+     * is shared with the Atunluto campaign site, so any of their users can
+     * sign in here successfully. Without this probe they would be bounced
+     * straight back to this form by the proxy with nothing on screen -
+     * indistinguishable from the click never registering. GET
+     * /api/admin/admins already runs authorizeAdminRequest and answers 401
+     * for a non-oto_admins session, so it doubles as the membership check.
+     */
+    const membershipCheck = await fetch("/api/admin/admins");
+    if (!membershipCheck.ok) {
+      await supabase.auth.signOut();
+      setSubmitting(false);
+      setErrorMessage("This account does not have admin access.");
+      return;
+    }
+
+    // Left submitting on the success path so the button stays disabled
+    // through the redirect rather than flashing back to "Sign in".
     router.push("/admin");
     router.refresh();
   }
