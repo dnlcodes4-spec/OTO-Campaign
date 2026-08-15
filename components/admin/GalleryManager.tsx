@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import Image from "next/image";
+import { useToast } from "./ToastProvider";
 
 type GalleryRecord = {
   id: string;
@@ -11,6 +13,7 @@ type GalleryRecord = {
   caption: string;
   storage_path: string;
   created_at: string;
+  posterUrl: string | null;
 };
 
 type SignedUpload = {
@@ -24,6 +27,8 @@ type SignedUpload = {
 type GalleryManagerProps = {
   extraHeaders?: Record<string, string>;
 };
+
+const SKELETON_TILES = 8;
 
 async function uploadToCloudinary(file: File, signed: SignedUpload, resourceType: "image" | "video") {
   const formData = new FormData();
@@ -45,7 +50,32 @@ async function uploadToCloudinary(file: File, signed: SignedUpload, resourceType
   return response.json() as Promise<{ secure_url: string; public_id: string; duration?: number }>;
 }
 
+function GalleryThumbnail({ item }: { item: GalleryRecord }) {
+  const [failed, setFailed] = useState(false);
+  const src = item.media_type === "image" ? item.url : item.posterUrl;
+
+  if (failed || !src) {
+    return (
+      <div className="flex h-full items-center justify-center bg-ink/5 font-body text-xs text-ink/40">
+        No preview
+      </div>
+    );
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={item.caption || `Gallery ${item.media_type}`}
+      fill
+      sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
+      className="object-cover"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 export function GalleryManager({ extraHeaders = {} }: GalleryManagerProps) {
+  const toast = useToast();
   const [items, setItems] = useState<GalleryRecord[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("loading");
   const [errorMessage, setErrorMessage] = useState("");
@@ -54,6 +84,8 @@ export function GalleryManager({ extraHeaders = {} }: GalleryManagerProps) {
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingCaption, setEditingCaption] = useState("");
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadItems = useCallback(async () => {
     const response = await fetch("/api/admin/gallery", { headers: extraHeaders });
@@ -116,6 +148,7 @@ export function GalleryManager({ extraHeaders = {} }: GalleryManagerProps) {
       if (createdBody.item) {
         setItems((previous) => [createdBody.item as GalleryRecord, ...previous]);
       }
+      toast.success("Uploaded.");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Upload failed");
     } finally {
@@ -127,15 +160,18 @@ export function GalleryManager({ extraHeaders = {} }: GalleryManagerProps) {
     if (!window.confirm("Delete this gallery item? This cannot be undone.")) {
       return;
     }
+    setDeletingId(id);
     const response = await fetch(`/api/admin/gallery/${id}`, {
       method: "DELETE",
       headers: extraHeaders,
     });
+    setDeletingId(null);
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      setErrorMessage(body.error ?? "Failed to delete gallery item");
+      toast.error(body.error ?? "Failed to delete gallery item");
       return;
     }
+    toast.success("Deleted.");
     await loadItems();
   }
 
@@ -145,17 +181,20 @@ export function GalleryManager({ extraHeaders = {} }: GalleryManagerProps) {
   }
 
   async function saveCaption(id: string) {
+    setSavingId(id);
     const response = await fetch(`/api/admin/gallery/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...extraHeaders },
       body: JSON.stringify({ caption: editingCaption }),
     });
+    setSavingId(null);
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      setErrorMessage(body.error ?? "Failed to update caption");
+      toast.error(body.error ?? "Failed to update caption");
       return;
     }
     setEditingId(null);
+    toast.success("Caption updated.");
     await loadItems();
   }
 
@@ -189,45 +228,70 @@ export function GalleryManager({ extraHeaders = {} }: GalleryManagerProps) {
         </button>
       </form>
 
-      {status === "loading" && <p>Loading gallery...</p>}
-
-      <ul className="flex flex-col gap-3">
-        {items.map((item) => (
-          <li key={item.id} className="flex items-center justify-between gap-4 border-b border-ink/10 pb-3">
-            <div className="flex flex-1 items-center gap-3">
-              <span className="text-sm text-ink/60">{item.media_type}</span>
-              {editingId === item.id ? (
-                <input
-                  type="text"
-                  value={editingCaption}
-                  onChange={(event) => setEditingCaption(event.target.value)}
-                  className="flex-1 border border-ink/20 px-2 py-1 text-sm"
-                />
-              ) : (
-                <p className="font-body">{item.caption || "(no caption)"}</p>
-              )}
-            </div>
-            <div className="flex gap-3">
-              {editingId === item.id ? (
-                <button type="button" onClick={() => saveCaption(item.id)} className="text-sm underline">
-                  Save
-                </button>
-              ) : (
-                <button type="button" onClick={() => startEditing(item)} className="text-sm underline">
-                  Edit caption
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => handleDelete(item.id)}
-                className="text-sm text-brand-red underline"
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {status === "loading" ? (
+        <div
+          aria-busy="true"
+          aria-label="Loading gallery"
+          className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+        >
+          {Array.from({ length: SKELETON_TILES }).map((_, index) => (
+            <div key={index} className="aspect-square animate-pulse bg-ink/10" />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <p className="font-body text-sm text-ink/60">No gallery items yet.</p>
+      ) : (
+        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {items.map((item) => (
+            <li key={item.id} className="flex flex-col border border-ink/10">
+              <div className="relative aspect-square bg-ink/5">
+                <GalleryThumbnail item={item} />
+                {item.media_type === "video" && (
+                  <span className="absolute bottom-1 right-1 bg-ink/70 px-1.5 py-0.5 font-body text-[10px] font-medium uppercase tracking-wide text-ink-inverse">
+                    Video
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-1 flex-col gap-2 p-3">
+                {editingId === item.id ? (
+                  <input
+                    type="text"
+                    value={editingCaption}
+                    onChange={(event) => setEditingCaption(event.target.value)}
+                    className="border border-ink/20 px-2 py-1 text-sm"
+                  />
+                ) : (
+                  <p className="line-clamp-2 font-body text-sm">{item.caption || "(no caption)"}</p>
+                )}
+                <div className="mt-auto flex gap-3 text-sm">
+                  {editingId === item.id ? (
+                    <button
+                      type="button"
+                      onClick={() => saveCaption(item.id)}
+                      disabled={savingId === item.id}
+                      className="underline disabled:opacity-50"
+                    >
+                      {savingId === item.id ? "Saving..." : "Save"}
+                    </button>
+                  ) : (
+                    <button type="button" onClick={() => startEditing(item)} className="underline">
+                      Edit caption
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(item.id)}
+                    disabled={deletingId === item.id}
+                    className="text-brand-red underline disabled:opacity-50"
+                  >
+                    {deletingId === item.id ? "Deleting..." : "Delete"}
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

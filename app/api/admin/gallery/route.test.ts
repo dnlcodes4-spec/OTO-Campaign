@@ -16,6 +16,11 @@ vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({ from: fromMock }),
 }));
 
+vi.mock("@/lib/cloudinary", () => ({
+  buildPosterUrl: (storagePath: string) =>
+    `https://res.cloudinary.com/test-cloud/video/upload/so_0,w_800,c_fill,q_auto,f_jpg/${storagePath}.jpg`,
+}));
+
 import { GET, POST } from "./route";
 
 beforeEach(() => {
@@ -62,6 +67,39 @@ test("GET returns 500 on a query error", async () => {
   orderMock.mockResolvedValue({ data: null, error: new Error("db down") });
   const response = await GET(new Request("http://localhost/api/admin/gallery"));
   expect(response.status).toBe(500);
+});
+
+test("GET derives a posterUrl for video items and leaves images without one", async () => {
+  authorizeAdminRequestMock.mockResolvedValue({ authorized: true, actingAdminId: "user-1" });
+  orderMock.mockResolvedValue({
+    data: [
+      {
+        id: "1",
+        media_type: "image",
+        url: "https://res.cloudinary.com/test-cloud/image/upload/oto-gallery/y.jpg",
+        duration_seconds: null,
+        caption: "",
+        storage_path: "oto-gallery/y",
+        created_at: "2026-01-01",
+      },
+      {
+        id: "2",
+        media_type: "video",
+        url: "https://res.cloudinary.com/test-cloud/video/upload/oto-gallery/v.mp4",
+        duration_seconds: 10,
+        caption: "",
+        storage_path: "oto-gallery/v",
+        created_at: "2026-01-02",
+      },
+    ],
+    error: null,
+  });
+  const response = await GET(new Request("http://localhost/api/admin/gallery"));
+  const body = await response.json();
+  expect(body.items[0].posterUrl).toBeNull();
+  expect(body.items[1].posterUrl).toBe(
+    "https://res.cloudinary.com/test-cloud/video/upload/so_0,w_800,c_fill,q_auto,f_jpg/oto-gallery/v.jpg"
+  );
 });
 
 test("POST rejects an unauthorized caller", async () => {
@@ -131,6 +169,32 @@ test("POST inserts a new gallery row", async () => {
     caption: "Rally",
     uploaded_by: "user-1",
   });
+});
+
+test("POST derives a posterUrl for a newly inserted video", async () => {
+  authorizeAdminRequestMock.mockResolvedValue({ authorized: true, actingAdminId: "user-1" });
+  singleMock.mockResolvedValue({
+    data: {
+      id: "3",
+      media_type: "video",
+      url: "https://x/v.mp4",
+      duration_seconds: 10,
+      caption: "",
+      storage_path: "oto-gallery/v",
+      created_at: "2026-01-03",
+    },
+    error: null,
+  });
+  const response = await POST(
+    new Request("http://localhost/api/admin/gallery", {
+      method: "POST",
+      body: JSON.stringify({ url: "https://x/v.mp4", storagePath: "oto-gallery/v", mediaType: "video" }),
+    })
+  );
+  const body = await response.json();
+  expect(body.item.posterUrl).toBe(
+    "https://res.cloudinary.com/test-cloud/video/upload/so_0,w_800,c_fill,q_auto,f_jpg/oto-gallery/v.jpg"
+  );
 });
 
 test("POST returns 500 on insert error", async () => {

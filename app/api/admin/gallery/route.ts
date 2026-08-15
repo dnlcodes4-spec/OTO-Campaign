@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 import { authorizeAdminRequest } from "@/lib/admin/authorize";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { buildPosterUrl } from "@/lib/cloudinary";
 
 const GALLERY_FIELDS = "id, media_type, url, duration_seconds, caption, storage_path, created_at";
+
+function withPosterUrl<T extends { media_type: string; storage_path: string }>(item: T) {
+  return {
+    ...item,
+    posterUrl: item.media_type === "video" ? buildPosterUrl(item.storage_path) : null,
+  };
+}
 
 export async function GET(request: Request) {
   const authz = await authorizeAdminRequest(request);
@@ -20,7 +28,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ items: data });
+  return NextResponse.json({ items: data.map(withPosterUrl) });
 }
 
 export async function POST(request: Request) {
@@ -63,5 +71,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ item: data }, { status: 201 });
+  return NextResponse.json({ item: withPosterUrl(data) }, { status: 201 });
 }
