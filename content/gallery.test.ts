@@ -55,6 +55,16 @@ test("catches an error thrown while creating the Supabase client and returns an 
   );
 });
 
+test("lets a Next.js dynamic-server-usage signal propagate instead of swallowing it", async () => {
+  const signal = Object.assign(new Error("Dynamic server usage"), {
+    digest: "DYNAMIC_SERVER_USAGE",
+  });
+  createClientMock.mockImplementation(async () => {
+    throw signal;
+  });
+  await expect(getGalleryItems()).rejects.toBe(signal);
+});
+
 test("maps image rows without a posterUrl", async () => {
   orderMock.mockResolvedValue({
     data: [

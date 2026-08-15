@@ -58,6 +58,16 @@ describe("isOtoAdmin", () => {
     });
     await expect(isOtoAdmin("user-4")).resolves.toBe(false);
   });
+
+  test("lets a Next.js internal signal propagate instead of swallowing it", async () => {
+    const signal = Object.assign(new Error("Dynamic server usage"), {
+      digest: "DYNAMIC_SERVER_USAGE",
+    });
+    createAdminClientMock.mockImplementation(() => {
+      throw signal;
+    });
+    await expect(isOtoAdmin("user-5")).rejects.toBe(signal);
+  });
 });
 
 describe("authorizeAdminRequest", () => {
@@ -149,5 +159,17 @@ describe("authorizeAdminRequest", () => {
     });
     const result = await authorizeAdminRequest(new Request("http://localhost/api/admin/admins"));
     expect(result).toEqual({ authorized: false });
+  });
+
+  test("lets a Next.js internal signal propagate instead of swallowing it", async () => {
+    const signal = Object.assign(new Error("Dynamic server usage"), {
+      digest: "DYNAMIC_SERVER_USAGE",
+    });
+    createServerClientMock.mockImplementation(async () => {
+      throw signal;
+    });
+    await expect(
+      authorizeAdminRequest(new Request("http://localhost/api/admin/admins"))
+    ).rejects.toBe(signal);
   });
 });

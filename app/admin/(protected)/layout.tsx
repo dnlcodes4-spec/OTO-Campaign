@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isOtoAdmin } from "@/lib/admin/authorize";
+import { isNextInternalSignal } from "@/lib/next-internal-errors";
 import { SignOutButton } from "@/components/admin/SignOutButton";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
@@ -15,6 +16,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     } = await supabase.auth.getUser();
     authorized = user !== null && (await isOtoAdmin(user.id));
   } catch (error) {
+    if (isNextInternalSignal(error)) throw error;
     // A malformed Supabase client (e.g. a missing env var) throws during
     // construction. This layout wraps the entire admin console, so a crash
     // here would take down every /admin/* page render, not just one. Fail

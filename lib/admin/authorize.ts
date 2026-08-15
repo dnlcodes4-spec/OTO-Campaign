@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isNextInternalSignal } from "@/lib/next-internal-errors";
 
 export type AdminAuthorization =
   | { authorized: true; actingAdminId: string | null }
@@ -25,6 +26,7 @@ export async function isOtoAdmin(userId: string): Promise<boolean> {
     if (error) return false;
     return data !== null;
   } catch (error) {
+    if (isNextInternalSignal(error)) throw error;
     // A malformed Supabase client (e.g. a missing env var) throws during
     // construction rather than returning a query error. This function
     // gates admin access, so it must fail closed (deny) rather than let
@@ -45,6 +47,7 @@ export async function authorizeAdminRequest(request: Request): Promise<AdminAuth
       return { authorized: true, actingAdminId: user.id };
     }
   } catch (error) {
+    if (isNextInternalSignal(error)) throw error;
     // Same fail-closed reasoning as isOtoAdmin: swallow the crash here and
     // fall through to the setup-key check below, rather than letting an
     // unhandled exception reach the API route caller as a raw 500.

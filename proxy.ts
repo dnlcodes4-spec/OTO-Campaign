@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { isOtoAdmin } from "@/lib/admin/authorize";
+import { isNextInternalSignal } from "@/lib/next-internal-errors";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -39,6 +40,7 @@ export async function proxy(request: NextRequest) {
 
     isAuthorized = user ? await isOtoAdmin(user.id) : false;
   } catch (error) {
+    if (isNextInternalSignal(error)) throw error;
     // A malformed Supabase client (e.g. a missing env var) throws during
     // construction. This gates every /admin/* request, so it must fail
     // closed (deny) rather than let the exception surface as a generic

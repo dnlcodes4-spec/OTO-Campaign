@@ -52,3 +52,13 @@ test("fails closed and redirects to login when the auth check throws, logging th
     expect.any(Error)
   );
 });
+
+test("lets a Next.js internal signal propagate instead of swallowing it into a redirect", async () => {
+  const signal = Object.assign(new Error("Dynamic server usage"), {
+    digest: "DYNAMIC_SERVER_USAGE",
+  });
+  createClientMock.mockImplementation(async () => {
+    throw signal;
+  });
+  await expect(AdminLayout({ children: null })).rejects.toBe(signal);
+});

@@ -82,3 +82,13 @@ test("still serves the login page itself when the auth check throws", async () =
   const response = await proxy(new NextRequest("http://localhost/admin/login"));
   expect(response.status).toBe(200);
 });
+
+test("lets a Next.js internal signal propagate instead of swallowing it", async () => {
+  const signal = Object.assign(new Error("Dynamic server usage"), {
+    digest: "DYNAMIC_SERVER_USAGE",
+  });
+  createServerClientMock.mockImplementation(() => {
+    throw signal;
+  });
+  await expect(proxy(new NextRequest("http://localhost/admin/admins"))).rejects.toBe(signal);
+});

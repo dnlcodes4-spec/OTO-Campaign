@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { buildPosterUrl } from "@/lib/cloudinary";
+import { isNextInternalSignal } from "@/lib/next-internal-errors";
 
 export type GalleryItem = {
   id: string;
@@ -32,6 +33,7 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
       createdAt: row.created_at,
     }));
   } catch (error) {
+    if (isNextInternalSignal(error)) throw error;
     // A malformed Supabase client (e.g. a missing env var) throws during
     // construction rather than returning a query error. Catching it here
     // keeps the gallery page rendering an empty grid instead of crashing
