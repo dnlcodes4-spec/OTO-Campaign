@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
+        // Scoped to our own Cloudinary account: res.cloudinary.com is a
+        // shared multi-tenant host, so an unscoped pathname would let
+        // next/image proxy and re-serve any other account's assets too.
+        pathname: `/${process.env.CLOUDINARY_CLOUD_NAME}/**`,
       },
     ],
   },
