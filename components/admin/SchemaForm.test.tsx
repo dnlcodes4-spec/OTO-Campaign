@@ -153,4 +153,43 @@ describe("SchemaForm", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add Entry" }));
     expect(onChange).toHaveBeenCalledWith({ education: [{}] });
   });
+
+  test("an absent optional field shows an add control instead of its inner field", () => {
+    const schema: Field = {
+      type: "group",
+      label: "Agenda item",
+      fields: { note: { type: "optional", field: { type: "text", label: "Note" } } },
+    };
+    render(<SchemaForm schema={schema} value={{}} onChange={vi.fn()} />);
+
+    expect(screen.queryByLabelText("Note")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add Note" })).toBeInTheDocument();
+  });
+
+  test("adding an optional field reveals its inner control with an empty value", () => {
+    const schema: Field = {
+      type: "group",
+      label: "Agenda item",
+      fields: { note: { type: "optional", field: { type: "text", label: "Note" } } },
+    };
+    const onChange = vi.fn();
+    render(<SchemaForm schema={schema} value={{}} onChange={onChange} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Add Note" }));
+    expect(onChange).toHaveBeenCalledWith({ note: "" });
+  });
+
+  test("a present optional field renders its inner control plus a remove-field control", () => {
+    const schema: Field = {
+      type: "group",
+      label: "Agenda item",
+      fields: { note: { type: "optional", field: { type: "text", label: "Note" } } },
+    };
+    const onChange = vi.fn();
+    render(<SchemaForm schema={schema} value={{ note: "A footnote" }} onChange={onChange} />);
+
+    expect(screen.getByLabelText("Note")).toHaveValue("A footnote");
+    fireEvent.click(screen.getByRole("button", { name: "Remove Note" }));
+    expect(onChange).toHaveBeenCalledWith({});
+  });
 });

@@ -118,7 +118,36 @@ function FieldControl({
     );
   }
 
-  // Remaining field types (optional, image) are added in later tasks.
+  if (field.type === "optional") {
+    const innerLabel = field.field.type === "group" ? field.field.label : (field.field as { label: string }).label;
+
+    if (value === undefined) {
+      return (
+        <button
+          type="button"
+          onClick={() => onChange(field.field.type === "group" ? {} : field.field.type === "list" ? [] : "")}
+          className="self-start border border-ink/20 px-4 py-2 text-sm font-body text-ink transition-colors hover:border-ink/40"
+        >
+          Add {innerLabel}
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-2">
+        <FieldControl field={field.field} path={path} value={value} onChange={onChange} />
+        <button
+          type="button"
+          onClick={() => onChange(undefined)}
+          className="self-start text-sm font-body text-brand-red underline"
+        >
+          Remove {innerLabel}
+        </button>
+      </div>
+    );
+  }
+
+  // Remaining field types (image) are added in later tasks.
   return null;
 }
 
