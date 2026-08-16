@@ -257,4 +257,33 @@ describe("SchemaForm", () => {
       })
     );
   });
+
+  test("shows an error and re-enables the control when onImageUpload rejects", async () => {
+    const schema: Field = {
+      type: "group",
+      label: "Home",
+      fields: { portrait: { type: "image", label: "Portrait" } },
+    };
+    const onChange = vi.fn();
+    const onImageUpload = vi.fn().mockRejectedValue(new Error("Cloudinary upload failed"));
+    render(
+      <SchemaForm
+        schema={schema}
+        value={{ portrait: { src: "/images/oto-native.png", alt: "OTO" } }}
+        onChange={onChange}
+        onImageUpload={onImageUpload}
+      />
+    );
+
+    const file = new File(["fake-bytes"], "new-portrait.jpg", { type: "image/jpeg" });
+    const input = screen.getByLabelText("Replace image") as HTMLInputElement;
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => expect(onImageUpload).toHaveBeenCalledWith(file));
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Cloudinary upload failed"));
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(input).not.toBeDisabled();
+    expect(input.value).toBe("");
+  });
 });

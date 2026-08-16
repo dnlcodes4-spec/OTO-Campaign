@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Field } from "@/content/schema-types";
 
 type SchemaFormProps = {
@@ -27,6 +28,11 @@ function FieldControl({
   onChange: (next: unknown) => void;
   onImageUpload?: (file: File) => Promise<{ src: string; alt?: string }>;
 }) {
+  const [imageUpload, setImageUpload] = useState<{ pending: boolean; error: string }>({
+    pending: false,
+    error: "",
+  });
+
   if (field.type === "text") {
     return (
       <label className="flex flex-col gap-1 text-sm font-body">
@@ -165,10 +171,22 @@ function FieldControl({
     };
 
     async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-      const file = event.target.files?.[0];
+      const input = event.target;
+      const file = input.files?.[0];
       if (!file || !onImageUpload) return;
-      const uploaded = await onImageUpload(file);
-      onChange({ ...imageValue, src: uploaded.src, alt: uploaded.alt ?? imageValue.alt });
+      setImageUpload({ pending: true, error: "" });
+      try {
+        const uploaded = await onImageUpload(file);
+        onChange({ ...imageValue, src: uploaded.src, alt: uploaded.alt ?? imageValue.alt });
+        setImageUpload({ pending: false, error: "" });
+      } catch (error) {
+        setImageUpload({
+          pending: false,
+          error: error instanceof Error ? error.message : "Failed to upload image",
+        });
+      } finally {
+        input.value = "";
+      }
     }
 
     return (
@@ -187,10 +205,26 @@ function FieldControl({
             className="border border-ink/20 px-3 py-2"
           />
         </label>
-        <label className="self-start cursor-pointer border border-ink/20 px-4 py-2 text-sm font-body text-ink transition-colors hover:border-ink/40">
-          Replace image
-          <input type="file" accept="image/*" onChange={handleFileChange} className="sr-only" aria-label="Replace image" />
+        <label
+          className={`self-start border border-ink/20 px-4 py-2 text-sm font-body text-ink transition-colors ${
+            imageUpload.pending ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:border-ink/40"
+          }`}
+        >
+          {imageUpload.pending ? "Uploading..." : "Replace image"}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={imageUpload.pending}
+            className="sr-only"
+            aria-label="Replace image"
+          />
         </label>
+        {imageUpload.error && (
+          <p role="alert" className="text-sm text-brand-red">
+            {imageUpload.error}
+          </p>
+        )}
       </div>
     );
   }
