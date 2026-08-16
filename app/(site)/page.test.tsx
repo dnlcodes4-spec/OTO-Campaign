@@ -26,6 +26,14 @@ vi.mock("@/content/senator-job", async () => {
   };
 });
 
+vi.mock("@/content/about", async () => {
+  const actual = await vi.importActual<typeof import("@/content/about")>("@/content/about");
+  return {
+    ...actual,
+    getAboutContent: async () => actual.aboutContentDefault,
+  };
+});
+
 /*
  * getWatchContent is mocked through a controllable vi.fn() (reset to
  * resolve watchContentDefault in beforeEach below) rather than a fixed
@@ -44,7 +52,7 @@ vi.mock("@/content/watch", async () => {
 });
 
 import HomePage from "./page";
-import { aboutContent } from "@/content/about";
+import { aboutContentDefault } from "@/content/about";
 import { getInvolvedContent } from "@/content/get-involved";
 import { siteContentDefault } from "@/content/site";
 import { senatorJobContentDefault } from "@/content/senator-job";
@@ -142,7 +150,7 @@ describe("Home page", () => {
       "src",
       expect.stringContaining("oto-native.png")
     );
-    expect(screen.getByAltText(aboutContent.portrait.alt)).toHaveAttribute(
+    expect(screen.getByAltText(aboutContentDefault.portrait.alt)).toHaveAttribute(
       "src",
       expect.stringContaining("oto-suit-2.png")
     );

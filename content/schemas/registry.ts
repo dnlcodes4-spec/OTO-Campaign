@@ -7,6 +7,8 @@ import { senatorJobSchema } from "./senator-job";
 import { senatorJobContentDefault } from "@/content/senator-job";
 import { watchSchema } from "./watch";
 import { watchContentDefault } from "@/content/watch";
+import { aboutSchema } from "./about";
+import { aboutContentDefault } from "@/content/about";
 
 /*
  * One entry per editable content file. Each content task (see the CMS
@@ -33,5 +35,10 @@ export const CONTENT_REGISTRY: Record<string, { label: string; schema: Field; de
     label: "Watch",
     schema: watchSchema,
     defaultValue: watchContentDefault,
+  },
+  about: {
+    label: "About",
+    schema: aboutSchema,
+    defaultValue: aboutContentDefault,
   },
 };

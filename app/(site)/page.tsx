@@ -13,6 +13,7 @@ import { getHomeContent } from "@/content/home";
 import { getSiteContentData } from "@/content/site";
 import { getSenatorJobContent } from "@/content/senator-job";
 import { getWatchContent, watchContentDefault } from "@/content/watch";
+import { getAboutContent } from "@/content/about";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -52,6 +53,7 @@ export default async function HomePage() {
   const { partyLogo } = await getSiteContentData();
   const senatorJobContent = await getSenatorJobContent();
   const watchContent = await getWatchContent();
+  const aboutContent = await getAboutContent();
   return (
     <>
       <Section tone="green">
@@ -64,7 +66,18 @@ export default async function HomePage() {
       </Section>
       <PlaneCut from="green" to="surface" />
       <Section id="about">
-        <PedigreeBlock />
+        <PedigreeBlock
+          nameParts={aboutContent.nameParts}
+          nameNote={aboutContent.nameNote}
+          portrait={aboutContent.portrait}
+          abujaAnswer={aboutContent.abujaAnswer}
+          abujaSupport={aboutContent.abujaSupport}
+          abujaRecord={aboutContent.abujaRecord}
+          character={aboutContent.character}
+          quote={aboutContent.quote}
+          education={aboutContent.education}
+          tieUps={aboutContent.tieUps}
+        />
         <StoryTeaser />
         <AtunlutoBlock />
       </Section>
