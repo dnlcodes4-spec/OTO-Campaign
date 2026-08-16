@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { getInvolvedContent } from "@/content/get-involved";
-import { siteContent } from "@/content/site";
 
 /*
  * The page ends the way the campaign document does: with the count. The
@@ -18,13 +17,26 @@ import { siteContent } from "@/content/site";
  * white card sits directly on the deep green plane with its own rounded
  * edge, the identical treatment the badge gets in the hero and footer.
  */
-export function VoteTargets() {
+type VoteTargetsProps = {
+  /*
+   * VoteTargets is nested inside HomePage's returned tree rather than being
+   * the component under direct test/render, so it stays a plain
+   * (non-async) component and takes the party badge as a prop from the
+   * page, which already awaits `getSiteContentData()` once for the route.
+   */
+  partyLogo: {
+    src: string;
+    alt: string;
+  };
+};
+
+export function VoteTargets({ partyLogo }: VoteTargetsProps) {
   return (
     <div>
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
         <Image
-          src={siteContent.partyLogo.src}
-          alt={siteContent.partyLogo.alt}
+          src={partyLogo.src}
+          alt={partyLogo.alt}
           width={186}
           height={160}
           className="order-1 h-auto w-28 self-end sm:w-36 lg:order-2 lg:w-44 lg:shrink-0 lg:self-auto"

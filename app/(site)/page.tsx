@@ -10,6 +10,7 @@ import { WatchBlock } from "@/components/sections/WatchBlock";
 import { GetInvolvedBlock } from "@/components/sections/GetInvolvedBlock";
 import { VoteTargets } from "@/components/sections/VoteTargets";
 import { getHomeContent } from "@/content/home";
+import { getSiteContentData } from "@/content/site";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -46,6 +47,7 @@ function PlaneCut({ from, to }: { from: PlaneTone; to: PlaneTone }) {
 
 export default async function HomePage() {
   const homeContent = await getHomeContent();
+  const { partyLogo } = await getSiteContentData();
   return (
     <>
       <Section tone="green">
@@ -53,6 +55,7 @@ export default async function HomePage() {
           headline={homeContent.headline}
           intro={homeContent.intro}
           portrait={homeContent.portrait}
+          partyLogo={partyLogo}
         />
       </Section>
       <PlaneCut from="green" to="surface" />
@@ -85,7 +88,7 @@ export default async function HomePage() {
       </Section>
       <PlaneCut from="green" to="ink" />
       <Section tone="ink">
-        <VoteTargets />
+        <VoteTargets partyLogo={partyLogo} />
       </Section>
     </>
   );

@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { socials, type SocialPlatform } from "@/content/site";
+import type { SocialLink, SocialPlatform } from "@/content/site";
 import {
   FacebookMark,
   InstagramMark,
@@ -34,6 +34,13 @@ const PLANE_LINK: Record<SocialLinksPlane, string> = {
 type SocialLinksProps = {
   plane: SocialLinksPlane;
   /*
+   * The Nav placements render inside a "use client" component tree, which
+   * cannot await the CMS-backed content itself, so every placement takes
+   * the resolved list as a prop from a server-rendered ancestor instead of
+   * importing it directly.
+   */
+  socials: SocialLink[];
+  /*
    * Mark size is a per-placement decision (subordinate beside the desktop
    * nav links, larger in the overlay coda), so the caller sets it.
    */
@@ -43,11 +50,16 @@ type SocialLinksProps = {
 
 /*
  * One row, three placements (header, overlay coda, footer), all reading the
- * same placeholder-driven array from content/site.ts. Every link opens the
- * platform in a new tab and is named "OTO on <platform>"; the glyphs stay
- * decorative.
+ * same placeholder-driven array sourced from content/site.ts. Every link
+ * opens the platform in a new tab and is named "OTO on <platform>"; the
+ * glyphs stay decorative.
  */
-export function SocialLinks({ plane, markClassName = "h-5 w-5", className = "" }: SocialLinksProps) {
+export function SocialLinks({
+  plane,
+  socials,
+  markClassName = "h-5 w-5",
+  className = "",
+}: SocialLinksProps) {
   return (
     <div className={`flex items-center ${className}`}>
       {socials.map((social) => {

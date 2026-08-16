@@ -10,10 +10,18 @@ vi.mock("@/content/home", () => ({
   }),
 }));
 
+vi.mock("@/content/site", async () => {
+  const actual = await vi.importActual<typeof import("@/content/site")>("@/content/site");
+  return {
+    ...actual,
+    getSiteContentData: async () => actual.siteContentDefault,
+  };
+});
+
 import HomePage from "./page";
 import { aboutContent } from "@/content/about";
 import { getInvolvedContent } from "@/content/get-involved";
-import { siteContent } from "@/content/site";
+import { siteContentDefault } from "@/content/site";
 import { watchContent } from "@/content/watch";
 
 // Same values as the `@/content/home` mock above (kept separate to avoid
@@ -115,7 +123,7 @@ describe("Home page", () => {
 
   test("features the party badge in the hero and on the vote-targets plane", async () => {
     render(await HomePage());
-    const badges = screen.getAllByAltText(siteContent.partyLogo.alt);
+    const badges = screen.getAllByAltText(siteContentDefault.partyLogo.alt);
     expect(badges).toHaveLength(2);
     for (const badge of badges) {
       expect(badge).toHaveAttribute("src", expect.stringContaining("zlp-logo.png"));

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { siteContent } from "@/content/site";
+import { getSiteContentData } from "@/content/site";
 import { SocialLinks } from "./SocialLinks";
 
 const LINKS = [
@@ -10,7 +10,8 @@ const LINKS = [
   { href: "/gallery", label: "Gallery" },
 ];
 
-export function Footer() {
+export async function Footer() {
+  const siteContent = await getSiteContentData();
   return (
     <footer className="bg-brand-green-deep px-6 py-12 text-ink-inverse sm:px-8 lg:px-12">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
@@ -60,7 +61,12 @@ export function Footer() {
            * same link grammar (soft inverse turning gold), right-aligned with
            * the column at sm and up.
            */}
-          <SocialLinks plane="dark" markClassName="h-5 w-5" className="mt-3 gap-5" />
+          <SocialLinks
+            plane="dark"
+            socials={siteContent.socials}
+            markClassName="h-5 w-5"
+            className="mt-3 gap-5"
+          />
         </nav>
       </div>
     </footer>
