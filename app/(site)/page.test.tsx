@@ -51,9 +51,17 @@ vi.mock("@/content/watch", async () => {
   };
 });
 
+vi.mock("@/content/get-involved", async () => {
+  const actual = await vi.importActual<typeof import("@/content/get-involved")>("@/content/get-involved");
+  return {
+    ...actual,
+    getGetInvolvedContent: async () => actual.getInvolvedContentDefault,
+  };
+});
+
 import HomePage from "./page";
 import { aboutContentDefault } from "@/content/about";
-import { getInvolvedContent } from "@/content/get-involved";
+import { getInvolvedContentDefault } from "@/content/get-involved";
 import { siteContentDefault } from "@/content/site";
 import { senatorJobContentDefault } from "@/content/senator-job";
 import { watchContentDefault } from "@/content/watch";
@@ -154,7 +162,7 @@ describe("Home page", () => {
       "src",
       expect.stringContaining("oto-suit-2.png")
     );
-    expect(screen.getByAltText(getInvolvedContent.image.alt)).toHaveAttribute(
+    expect(screen.getByAltText(getInvolvedContentDefault.image.alt)).toHaveAttribute(
       "src",
       expect.stringContaining("oto-suit-1.png")
     );

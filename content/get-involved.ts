@@ -1,3 +1,5 @@
+import { getSiteContent } from "@/lib/content/site-content";
+
 export type Ask = {
   number: string;
   title: string;
@@ -14,7 +16,7 @@ export type TurnoutStat = {
   label: string;
 };
 
-export const getInvolvedContent = {
+export const getInvolvedContentDefault = {
   turnoutStats: [
     {
       figure: "4,000,000",
@@ -74,3 +76,7 @@ export const getInvolvedContent = {
   epigraph:
     "…and when they heard of it, it grieved them exceedingly that there was come a man to seek the welfare of the children of Oyo South Senatorial District",
 };
+
+export async function getGetInvolvedContent() {
+  return getSiteContent("get-involved", getInvolvedContentDefault);
+}

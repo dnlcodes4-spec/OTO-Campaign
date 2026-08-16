@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getInvolvedContent } from "@/content/get-involved";
+import type { VoteTarget } from "@/content/get-involved";
 
 /*
  * The page ends the way the campaign document does: with the count. The
@@ -28,9 +28,13 @@ type VoteTargetsProps = {
     src: string;
     alt: string;
   };
+  targetsLead: string;
+  targets: VoteTarget[];
+  targetsSupport: string;
+  epigraph: string;
 };
 
-export function VoteTargets({ partyLogo }: VoteTargetsProps) {
+export function VoteTargets({ partyLogo, targetsLead, targets, targetsSupport, epigraph }: VoteTargetsProps) {
   return (
     <div>
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
@@ -42,11 +46,11 @@ export function VoteTargets({ partyLogo }: VoteTargetsProps) {
           className="order-1 h-auto w-28 self-end sm:w-36 lg:order-2 lg:w-44 lg:shrink-0 lg:self-auto"
         />
         <p className="order-2 max-w-2xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg lg:order-1">
-          {getInvolvedContent.targetsLead}
+          {targetsLead}
         </p>
       </div>
       <div className="mt-10 flex flex-col gap-10 lg:mt-14 lg:gap-14">
-        {getInvolvedContent.targets.map((target) => (
+        {targets.map((target) => (
           <div key={target.figure} className="border-t border-ink-inverse/20 pt-6 lg:w-4/5">
             <p className="font-display text-6xl font-semibold leading-none tracking-tight text-brand-gold sm:text-7xl lg:text-9xl">
               {target.figure}
@@ -58,10 +62,10 @@ export function VoteTargets({ partyLogo }: VoteTargetsProps) {
         ))}
       </div>
       <p className="mt-6 max-w-xl font-body text-base leading-relaxed text-ink-inverse/60">
-        {getInvolvedContent.targetsSupport}
+        {targetsSupport}
       </p>
       <p className="mt-16 max-w-3xl font-display text-xl font-medium leading-snug text-ink-inverse/60 sm:text-2xl lg:mt-24">
-        &ldquo;{getInvolvedContent.epigraph}&rdquo;
+        &ldquo;{epigraph}&rdquo;
       </p>
     </div>
   );

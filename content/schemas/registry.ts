@@ -9,6 +9,8 @@ import { watchSchema } from "./watch";
 import { watchContentDefault } from "@/content/watch";
 import { aboutSchema } from "./about";
 import { aboutContentDefault } from "@/content/about";
+import { getInvolvedSchema } from "./get-involved";
+import { getInvolvedContentDefault } from "@/content/get-involved";
 
 /*
  * One entry per editable content file. Each content task (see the CMS
@@ -40,5 +42,10 @@ export const CONTENT_REGISTRY: Record<string, { label: string; schema: Field; de
     label: "About",
     schema: aboutSchema,
     defaultValue: aboutContentDefault,
+  },
+  "get-involved": {
+    label: "Get Involved",
+    schema: getInvolvedSchema,
+    defaultValue: getInvolvedContentDefault,
   },
 };

@@ -14,6 +14,7 @@ import { getSiteContentData } from "@/content/site";
 import { getSenatorJobContent } from "@/content/senator-job";
 import { getWatchContent, watchContentDefault } from "@/content/watch";
 import { getAboutContent } from "@/content/about";
+import { getGetInvolvedContent } from "@/content/get-involved";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -54,6 +55,7 @@ export default async function HomePage() {
   const senatorJobContent = await getSenatorJobContent();
   const watchContent = await getWatchContent();
   const aboutContent = await getAboutContent();
+  const getInvolvedContent = await getGetInvolvedContent();
   return (
     <>
       <Section tone="green">
@@ -124,11 +126,22 @@ export default async function HomePage() {
       </Section>
       <PlaneCut from="ink" to="green" />
       <Section id="get-involved" tone="green">
-        <GetInvolvedBlock />
+        <GetInvolvedBlock
+          turnoutStats={getInvolvedContent.turnoutStats}
+          turnoutBody={getInvolvedContent.turnoutBody}
+          image={getInvolvedContent.image}
+          asks={getInvolvedContent.asks}
+        />
       </Section>
       <PlaneCut from="green" to="ink" />
       <Section tone="ink">
-        <VoteTargets partyLogo={partyLogo} />
+        <VoteTargets
+          partyLogo={partyLogo}
+          targetsLead={getInvolvedContent.targetsLead}
+          targets={getInvolvedContent.targets}
+          targetsSupport={getInvolvedContent.targetsSupport}
+          epigraph={getInvolvedContent.epigraph}
+        />
       </Section>
     </>
   );
