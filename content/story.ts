@@ -1,3 +1,5 @@
+import { getSiteContent } from "@/lib/content/site-content";
+
 export type StorySection = {
   heading: string;
   body: string[];
@@ -9,7 +11,7 @@ export type StorySection = {
  * page; the page content carries the full narrative on /story. Nothing is
  * embellished beyond the brief's own account.
  */
-export const storyContent = {
+export const storyContentDefault = {
   teaser: {
     paragraphs: [
       "Born in Eruwa 58 years ago to two teachers whose salaries could not always feed the house, OTO read quantity surveying at the Federal University of Technology, Minna, and reached the United Kingdom on an uncle's half-paid tuition and years of back-breaking work for the rest.",
@@ -71,3 +73,7 @@ export const storyContent = {
     },
   },
 };
+
+export async function getStoryContent() {
+  return getSiteContent("story", storyContentDefault);
+}

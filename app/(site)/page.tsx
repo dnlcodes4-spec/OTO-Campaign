@@ -16,6 +16,7 @@ import { getWatchContent, watchContentDefault } from "@/content/watch";
 import { getAboutContent } from "@/content/about";
 import { getGetInvolvedContent } from "@/content/get-involved";
 import { getAtunlutoContent } from "@/content/atunluto";
+import { getStoryContent } from "@/content/story";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -58,6 +59,7 @@ export default async function HomePage() {
   const aboutContent = await getAboutContent();
   const getInvolvedContent = await getGetInvolvedContent();
   const atunlutoContent = await getAtunlutoContent();
+  const storyContent = await getStoryContent();
   return (
     <>
       <Section tone="green">
@@ -82,7 +84,11 @@ export default async function HomePage() {
           education={aboutContent.education}
           tieUps={aboutContent.tieUps}
         />
-        <StoryTeaser />
+        <StoryTeaser
+          paragraphs={storyContent.teaser.paragraphs}
+          cta={storyContent.teaser.cta}
+          href={storyContent.teaser.href}
+        />
         <AtunlutoBlock
           answer={atunlutoContent.answer}
           caucusLine={atunlutoContent.caucusLine}

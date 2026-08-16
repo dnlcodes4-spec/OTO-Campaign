@@ -13,6 +13,8 @@ import { getInvolvedSchema } from "./get-involved";
 import { getInvolvedContentDefault } from "@/content/get-involved";
 import { atunlutoSchema } from "./atunluto";
 import { atunlutoContentDefault } from "@/content/atunluto";
+import { storySchema } from "./story";
+import { storyContentDefault } from "@/content/story";
 
 /*
  * One entry per editable content file. Each content task (see the CMS
@@ -54,5 +56,10 @@ export const CONTENT_REGISTRY: Record<string, { label: string; schema: Field; de
     label: "Atunluto",
     schema: atunlutoSchema,
     defaultValue: atunlutoContentDefault,
+  },
+  story: {
+    label: "Story",
+    schema: storySchema,
+    defaultValue: storyContentDefault,
   },
 };

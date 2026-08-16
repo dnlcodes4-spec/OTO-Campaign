@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Section } from "@/components/primitives/Section";
 import { Heading } from "@/components/primitives/Heading";
-import { storyContent } from "@/content/story";
+import { getStoryContent } from "@/content/story";
 
 export const metadata: Metadata = {
   title: "The OTO Story",
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
  * the reader back to the agenda, because the story is the warrant for the
  * agenda, not a destination of its own.
  */
-export default function StoryPage() {
-  const { page } = storyContent;
+export default async function StoryPage() {
+  const { page } = await getStoryContent();
   return (
     <>
       <Section tone="green">
