@@ -1,3 +1,5 @@
+import { getSiteContent } from "@/lib/content/site-content";
+
 export type VideoSource =
   | { type: "youtube"; videoId: string }
   | { type: "direct"; src: string; poster: string };
@@ -37,7 +39,7 @@ export type WatchContent = {
   };
 };
 
-export const watchContent: WatchContent = {
+export const watchContentDefault: WatchContent = {
   video: {
     type: "direct",
     src: "https://res.cloudinary.com/dgols34tu/video/upload/v1786781549/oto-gallery/whatsapp-video-2026-08-09-at-12-56-15-am-1.mp4",
@@ -52,3 +54,7 @@ export const watchContent: WatchContent = {
     detail: "",
   },
 };
+
+export async function getWatchContent() {
+  return getSiteContent("watch", watchContentDefault);
+}

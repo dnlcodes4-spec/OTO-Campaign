@@ -26,12 +26,20 @@ vi.mock("@/content/senator-job", async () => {
   };
 });
 
+vi.mock("@/content/watch", async () => {
+  const actual = await vi.importActual<typeof import("@/content/watch")>("@/content/watch");
+  return {
+    ...actual,
+    getWatchContent: async () => actual.watchContentDefault,
+  };
+});
+
 import HomePage from "./page";
 import { aboutContent } from "@/content/about";
 import { getInvolvedContent } from "@/content/get-involved";
 import { siteContentDefault } from "@/content/site";
 import { senatorJobContentDefault } from "@/content/senator-job";
-import { watchContent } from "@/content/watch";
+import { watchContentDefault } from "@/content/watch";
 
 // Same values as the `@/content/home` mock above (kept separate to avoid
 // referencing an outer variable inside the hoisted vi.mock factory).
@@ -170,7 +178,7 @@ describe("Home page", () => {
     ).toBeInTheDocument();
     expect(container.querySelector("iframe")).toBeNull();
     expect(container.querySelector("video")).toBeNull();
-    expect(within(watch).getByRole("button", { name: `Play the film: ${watchContent.title}` })).toBeInTheDocument();
+    expect(within(watch).getByRole("button", { name: `Play the film: ${watchContentDefault.title}` })).toBeInTheDocument();
   });
 
   test("get involved carries the asks and the single vote target", async () => {

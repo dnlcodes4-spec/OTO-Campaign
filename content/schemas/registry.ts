@@ -5,6 +5,8 @@ import { siteSchema } from "./site";
 import { siteContentDefault } from "@/content/site";
 import { senatorJobSchema } from "./senator-job";
 import { senatorJobContentDefault } from "@/content/senator-job";
+import { watchSchema } from "./watch";
+import { watchContentDefault } from "@/content/watch";
 
 /*
  * One entry per editable content file. Each content task (see the CMS
@@ -26,5 +28,10 @@ export const CONTENT_REGISTRY: Record<string, { label: string; schema: Field; de
     label: "Senator Job",
     schema: senatorJobSchema,
     defaultValue: senatorJobContentDefault,
+  },
+  watch: {
+    label: "Watch",
+    schema: watchSchema,
+    defaultValue: watchContentDefault,
   },
 };
