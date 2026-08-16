@@ -17,6 +17,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 }));
 
 import { GET, PATCH } from "./route";
+import { homeContentDefault } from "@/content/home";
 
 beforeEach(() => {
   authorizeAdminRequestMock.mockReset();
@@ -52,7 +53,7 @@ test("GET returns the merged content for a known key", async () => {
   });
   expect(response.status).toBe(200);
   const body = await response.json();
-  expect(body.content).toEqual({ headline: "Edited" });
+  expect(body.content).toEqual({ ...homeContentDefault, headline: "Edited" });
 });
 
 test("PATCH rejects an unauthorized caller", async () => {

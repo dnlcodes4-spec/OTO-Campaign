@@ -1,4 +1,6 @@
 import type { Field } from "@/content/schema-types";
+import { homeSchema } from "./home";
+import { homeContentDefault } from "@/content/home";
 
 /*
  * One entry per editable content file. Each content task (see the CMS
@@ -8,7 +10,7 @@ import type { Field } from "@/content/schema-types";
 export const CONTENT_REGISTRY: Record<string, { label: string; schema: Field; defaultValue: unknown }> = {
   home: {
     label: "Home",
-    schema: { type: "group", label: "Home", fields: { headline: { type: "text", label: "Headline" } } },
-    defaultValue: { headline: "" },
+    schema: homeSchema,
+    defaultValue: homeContentDefault,
   },
 };

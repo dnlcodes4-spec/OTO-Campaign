@@ -9,7 +9,7 @@ import { SenatorJob } from "@/components/sections/SenatorJob";
 import { WatchBlock } from "@/components/sections/WatchBlock";
 import { GetInvolvedBlock } from "@/components/sections/GetInvolvedBlock";
 import { VoteTargets } from "@/components/sections/VoteTargets";
-import { homeContent } from "@/content/home";
+import { getHomeContent } from "@/content/home";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -44,7 +44,8 @@ function PlaneCut({ from, to }: { from: PlaneTone; to: PlaneTone }) {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const homeContent = await getHomeContent();
   return (
     <>
       <Section tone="green">

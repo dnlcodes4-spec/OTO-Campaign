@@ -1,11 +1,29 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
+
+vi.mock("@/content/home", () => ({
+  getHomeContent: async () => ({
+    headline: "Send someone who actually shows up.",
+    intro:
+      "Many Nigerians have yearned, thirsted and hungered for a change, but after all is said and done, they join the bandwagon and vote for the same. That was exactly what went wrong about eight years ago. This time, ask the questions first: why should we send you to Abuja, what do you have in mind for us, what pedigree do you have.",
+    portrait: { src: "/images/oto-native.png", alt: "OTO, Oluwasegun Theophilus Oladimeji, in gold agbada and fila" },
+  }),
+}));
+
 import HomePage from "./page";
-import { homeContent } from "@/content/home";
 import { aboutContent } from "@/content/about";
 import { getInvolvedContent } from "@/content/get-involved";
 import { siteContent } from "@/content/site";
 import { watchContent } from "@/content/watch";
+
+// Same values as the `@/content/home` mock above (kept separate to avoid
+// referencing an outer variable inside the hoisted vi.mock factory).
+const homeContent = {
+  headline: "Send someone who actually shows up.",
+  intro:
+    "Many Nigerians have yearned, thirsted and hungered for a change, but after all is said and done, they join the bandwagon and vote for the same. That was exactly what went wrong about eight years ago. This time, ask the questions first: why should we send you to Abuja, what do you have in mind for us, what pedigree do you have.",
+  portrait: { src: "/images/oto-native.png", alt: "OTO, Oluwasegun Theophilus Oladimeji, in gold agbada and fila" },
+};
 
 function getSection(container: HTMLElement, id: string) {
   const section = container.querySelector(`#${id}`);
@@ -14,23 +32,23 @@ function getSection(container: HTMLElement, id: string) {
 }
 
 describe("Home page", () => {
-  test("renders the poster headline", () => {
-    render(<HomePage />);
+  test("renders the poster headline", async () => {
+    render(await HomePage());
     expect(
       screen.getByRole("heading", { level: 1, name: "Send someone who actually shows up." })
     ).toBeInTheDocument();
   });
 
-  test("carries the four one-page sections by id", () => {
-    const { container } = render(<HomePage />);
+  test("carries the four one-page sections by id", async () => {
+    const { container } = render(await HomePage());
     getSection(container, "about");
     getSection(container, "agenda");
     getSection(container, "watch");
     getSection(container, "get-involved");
   });
 
-  test("about answers the pedigree question", () => {
-    const { container } = render(<HomePage />);
+  test("about answers the pedigree question", async () => {
+    const { container } = render(await HomePage());
     const about = getSection(container, "about");
     expect(
       within(about).getAllByText(/Federal University of Technology, Minna/).length
@@ -44,8 +62,8 @@ describe("Home page", () => {
     expect(within(about).getByText("Cranfield University")).toBeInTheDocument();
   });
 
-  test("about features the Atunluto structure inside its plane", () => {
-    const { container } = render(<HomePage />);
+  test("about features the Atunluto structure inside its plane", async () => {
+    const { container } = render(await HomePage());
     const about = getSection(container, "about");
     expect(
       within(about).getByText(/Atunluto caucus within the Zenith Labour Party/)
@@ -55,8 +73,8 @@ describe("Home page", () => {
     ).toHaveAttribute("href", "https://www.atunluto.com");
   });
 
-  test("agenda carries the six legislative items", () => {
-    const { container } = render(<HomePage />);
+  test("agenda carries the six legislative items", async () => {
+    const { container } = render(await HomePage());
     const agenda = getSection(container, "agenda");
     expect(
       within(agenda).getByRole("heading", { name: "State police" })
@@ -77,8 +95,8 @@ describe("Home page", () => {
     ).toBeInTheDocument();
   });
 
-  test("composes the three candidate portraits with their content-file alt text", () => {
-    render(<HomePage />);
+  test("composes the three candidate portraits with their content-file alt text", async () => {
+    render(await HomePage());
     // 3 candidate portraits + 2 party badges + 1 featured-video facade poster.
     expect(screen.getAllByRole("img")).toHaveLength(6);
     expect(screen.getByAltText(homeContent.portrait.alt)).toHaveAttribute(
@@ -95,8 +113,8 @@ describe("Home page", () => {
     );
   });
 
-  test("features the party badge in the hero and on the vote-targets plane", () => {
-    render(<HomePage />);
+  test("features the party badge in the hero and on the vote-targets plane", async () => {
+    render(await HomePage());
     const badges = screen.getAllByAltText(siteContent.partyLogo.alt);
     expect(badges).toHaveLength(2);
     for (const badge of badges) {
@@ -108,8 +126,8 @@ describe("Home page", () => {
     expect(targets?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
   });
 
-  test("the film plane features the current clip as a facade, no embed until pressed", () => {
-    const { container } = render(<HomePage />);
+  test("the film plane features the current clip as a facade, no embed until pressed", async () => {
+    const { container } = render(await HomePage());
     const watch = getSection(container, "watch");
     expect(
       within(watch).getByRole("heading", {
@@ -122,8 +140,8 @@ describe("Home page", () => {
     expect(within(watch).getByRole("button", { name: `Play the film: ${watchContent.title}` })).toBeInTheDocument();
   });
 
-  test("get involved carries the asks and the single vote target", () => {
-    const { container } = render(<HomePage />);
+  test("get involved carries the asks and the single vote target", async () => {
+    const { container } = render(await HomePage());
     const getInvolved = getSection(container, "get-involved");
     expect(within(getInvolved).getByText(/at least ten more/)).toBeInTheDocument();
     expect(within(getInvolved).getByText(/the 2027 election/)).toBeInTheDocument();
