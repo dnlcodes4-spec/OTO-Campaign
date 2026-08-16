@@ -28,5 +28,19 @@ export const agendaSchema: Field = {
   fields: {
     intro: { type: "longtext", label: "Intro" },
     items: { type: "list", label: "Items", item: itemSchema },
+    pledgesIntro: { type: "longtext", label: "Pledges intro" },
+    pledgesPull: { type: "longtext", label: "Pledges pull-line" },
+    pledges: {
+      type: "list",
+      label: "Pledges",
+      item: {
+        type: "group",
+        label: "Pledge",
+        fields: {
+          title: { type: "text", label: "Title" },
+          detail: { type: "longtext", label: "Detail" },
+        },
+      },
+    },
   },
 };
