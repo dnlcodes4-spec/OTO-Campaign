@@ -6,6 +6,7 @@ type SchemaFormProps = {
   schema: Field;
   value: unknown;
   onChange: (next: unknown) => void;
+  onImageUpload?: (file: File) => Promise<{ src: string; alt?: string }>;
 };
 
 function setKey(value: unknown, key: string, next: unknown): Record<string, unknown> {
@@ -18,11 +19,13 @@ function FieldControl({
   path,
   value,
   onChange,
+  onImageUpload,
 }: {
   field: Field;
   path: string;
   value: unknown;
   onChange: (next: unknown) => void;
+  onImageUpload?: (file: File) => Promise<{ src: string; alt?: string }>;
 }) {
   if (field.type === "text") {
     return (
@@ -70,6 +73,7 @@ function FieldControl({
             path={`${path}.${key}`}
             value={groupValue[key]}
             onChange={(next) => onChange(setKey(groupValue, key, next))}
+            onImageUpload={onImageUpload}
           />
         ))}
       </fieldset>
@@ -96,6 +100,7 @@ function FieldControl({
                   updated[index] = next;
                   onChange(updated);
                 }}
+                onImageUpload={onImageUpload}
               />
             </div>
             <button
@@ -135,7 +140,13 @@ function FieldControl({
 
     return (
       <div className="flex flex-col gap-2">
-        <FieldControl field={field.field} path={path} value={value} onChange={onChange} />
+        <FieldControl
+          field={field.field}
+          path={path}
+          value={value}
+          onChange={onChange}
+          onImageUpload={onImageUpload}
+        />
         <button
           type="button"
           onClick={() => onChange(undefined)}
@@ -147,13 +158,51 @@ function FieldControl({
     );
   }
 
-  // Remaining field types (image) are added in later tasks.
+  if (field.type === "image") {
+    const imageValue = (value && typeof value === "object" ? value : { src: "", alt: "" }) as {
+      src: string;
+      alt: string;
+    };
+
+    async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+      const file = event.target.files?.[0];
+      if (!file || !onImageUpload) return;
+      const uploaded = await onImageUpload(file);
+      onChange({ ...imageValue, src: uploaded.src, alt: uploaded.alt ?? imageValue.alt });
+    }
+
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="text-sm font-body font-medium text-ink">{field.label}</p>
+        {imageValue.src && (
+          // eslint-disable-next-line @next/next/no-img-element -- src may be a Cloudinary URL not covered by next/image's remotePatterns at edit time
+          <img src={imageValue.src} alt={imageValue.alt} className="h-32 w-32 object-cover" />
+        )}
+        <label className="flex flex-col gap-1 text-sm font-body">
+          Alt text
+          <input
+            type="text"
+            value={imageValue.alt}
+            onChange={(event) => onChange({ ...imageValue, alt: event.target.value })}
+            className="border border-ink/20 px-3 py-2"
+          />
+        </label>
+        <label className="self-start cursor-pointer border border-ink/20 px-4 py-2 text-sm font-body text-ink transition-colors hover:border-ink/40">
+          Replace image
+          <input type="file" accept="image/*" onChange={handleFileChange} className="sr-only" aria-label="Replace image" />
+        </label>
+      </div>
+    );
+  }
+
   return null;
 }
 
-export function SchemaForm({ schema, value, onChange }: SchemaFormProps) {
+export function SchemaForm({ schema, value, onChange, onImageUpload }: SchemaFormProps) {
   if (schema.type !== "group") {
-    return <FieldControl field={schema} path="root" value={value} onChange={onChange} />;
+    return (
+      <FieldControl field={schema} path="root" value={value} onChange={onChange} onImageUpload={onImageUpload} />
+    );
   }
 
   const groupValue = (value && typeof value === "object" ? value : {}) as Record<string, unknown>;
@@ -166,6 +215,7 @@ export function SchemaForm({ schema, value, onChange }: SchemaFormProps) {
           path={key}
           value={groupValue[key]}
           onChange={(next) => onChange(setKey(groupValue, key, next))}
+          onImageUpload={onImageUpload}
         />
       ))}
     </div>

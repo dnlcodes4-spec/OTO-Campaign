@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SchemaForm } from "./SchemaForm";
 import type { Field } from "@/content/schema-types";
 
@@ -191,5 +191,70 @@ describe("SchemaForm", () => {
     expect(screen.getByLabelText("Note")).toHaveValue("A footnote");
     fireEvent.click(screen.getByRole("button", { name: "Remove Note" }));
     expect(onChange).toHaveBeenCalledWith({});
+  });
+
+  test("renders the current image and an alt text field", () => {
+    const schema: Field = {
+      type: "group",
+      label: "Home",
+      fields: { portrait: { type: "image", label: "Portrait" } },
+    };
+    render(
+      <SchemaForm
+        schema={schema}
+        value={{ portrait: { src: "/images/oto-native.png", alt: "OTO in agbada" } }}
+        onChange={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole("img", { name: "OTO in agbada" })).toHaveAttribute("src", "/images/oto-native.png");
+    expect(screen.getByLabelText("Alt text")).toHaveValue("OTO in agbada");
+  });
+
+  test("editing alt text updates only the alt field", () => {
+    const schema: Field = {
+      type: "group",
+      label: "Home",
+      fields: { portrait: { type: "image", label: "Portrait" } },
+    };
+    const onChange = vi.fn();
+    render(
+      <SchemaForm
+        schema={schema}
+        value={{ portrait: { src: "/images/oto-native.png", alt: "Old alt" } }}
+        onChange={onChange}
+      />
+    );
+
+    fireEvent.change(screen.getByLabelText("Alt text"), { target: { value: "New alt" } });
+    expect(onChange).toHaveBeenCalledWith({ portrait: { src: "/images/oto-native.png", alt: "New alt" } });
+  });
+
+  test("choosing a replacement file calls onImageUpload and updates src on success", async () => {
+    const schema: Field = {
+      type: "group",
+      label: "Home",
+      fields: { portrait: { type: "image", label: "Portrait" } },
+    };
+    const onChange = vi.fn();
+    const onImageUpload = vi.fn().mockResolvedValue({ src: "https://res.cloudinary.com/x/new.jpg" });
+    render(
+      <SchemaForm
+        schema={schema}
+        value={{ portrait: { src: "/images/oto-native.png", alt: "OTO" } }}
+        onChange={onChange}
+        onImageUpload={onImageUpload}
+      />
+    );
+
+    const file = new File(["fake-bytes"], "new-portrait.jpg", { type: "image/jpeg" });
+    fireEvent.change(screen.getByLabelText("Replace image"), { target: { files: [file] } });
+
+    await waitFor(() => expect(onImageUpload).toHaveBeenCalledWith(file));
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith({
+        portrait: { src: "https://res.cloudinary.com/x/new.jpg", alt: "OTO" },
+      })
+    );
   });
 });
