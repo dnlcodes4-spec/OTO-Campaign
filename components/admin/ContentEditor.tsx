@@ -43,16 +43,22 @@ export function ContentEditor({ contentKey, schema, label }: ContentEditorProps)
   const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(async () => {
-    const response = await fetch(`/api/admin/content/${contentKey}`);
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      toast.error(body.error ?? "Failed to load content");
+    setStatus("loading");
+    try {
+      const response = await fetch(`/api/admin/content/${contentKey}`);
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        toast.error(body.error ?? "Failed to load content");
+        setStatus("error");
+        return;
+      }
+      const body = await response.json();
+      setValue(body.content);
+      setStatus("idle");
+    } catch {
+      toast.error("Couldn't reach the server. Check your connection and try again.");
       setStatus("error");
-      return;
     }
-    const body = await response.json();
-    setValue(body.content);
-    setStatus("idle");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentKey]);
 
@@ -62,20 +68,25 @@ export function ContentEditor({ contentKey, schema, label }: ContentEditorProps)
 
   async function handleSave() {
     setSubmitting(true);
-    const response = await fetch(`/api/admin/content/${contentKey}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: value }),
-    });
-    setSubmitting(false);
+    try {
+      const response = await fetch(`/api/admin/content/${contentKey}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: value }),
+      });
 
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      toast.error(body.error ?? "Failed to save content");
-      return;
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        toast.error(body.error ?? "Failed to save content");
+        return;
+      }
+
+      toast.success(`${label} saved.`);
+    } catch {
+      toast.error("Couldn't reach the server. Your edits are still here — try saving again.");
+    } finally {
+      setSubmitting(false);
     }
-
-    toast.success(`${label} saved.`);
   }
 
   if (status === "loading") {
@@ -83,7 +94,18 @@ export function ContentEditor({ contentKey, schema, label }: ContentEditorProps)
   }
 
   if (status === "error") {
-    return null;
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="font-body text-sm text-ink/70">Couldn&apos;t load {label.toLowerCase()}.</p>
+        <button
+          type="button"
+          onClick={load}
+          className="border border-ink/20 px-4 py-2 text-sm font-body text-ink transition-colors hover:border-ink/40"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (

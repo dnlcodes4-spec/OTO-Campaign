@@ -60,6 +60,51 @@ test("saves the edited content and shows a success toast", async () => {
   });
 });
 
+test("a rejected fetch on initial load shows a Retry button, which re-fetches on click", async () => {
+  const fetchMock = vi
+    .fn()
+    .mockRejectedValueOnce(new TypeError("Failed to fetch"))
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ content: { headline: "Current headline" } }) });
+  global.fetch = fetchMock as unknown as typeof fetch;
+
+  render(<ContentEditor contentKey="home" schema={schema} label="Home" />);
+
+  const retryButton = await screen.findByRole("button", { name: "Retry" });
+  await waitFor(() =>
+    expect(errorMock).toHaveBeenCalledWith("Couldn't reach the server. Check your connection and try again.")
+  );
+
+  fireEvent.click(retryButton);
+
+  expect(await screen.findByDisplayValue("Current headline")).toBeInTheDocument();
+});
+
+test("a rejected fetch during save calls the error toast and re-enables the Save button", async () => {
+  const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+    if (!init || init.method === undefined) {
+      return Promise.resolve({ ok: true, json: async () => ({ content: { headline: "Current headline" } }) });
+    }
+    if (init.method === "PATCH") {
+      return Promise.reject(new TypeError("Failed to fetch"));
+    }
+    return Promise.reject(new Error(`Unhandled fetch: ${url}`));
+  });
+  global.fetch = fetchMock as unknown as typeof fetch;
+
+  render(<ContentEditor contentKey="home" schema={schema} label="Home" />);
+  await screen.findByDisplayValue("Current headline");
+
+  fireEvent.change(screen.getByLabelText("Headline"), { target: { value: "Attempted edit" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+  await waitFor(() =>
+    expect(errorMock).toHaveBeenCalledWith("Couldn't reach the server. Your edits are still here — try saving again.")
+  );
+
+  const saveButton = screen.getByRole("button", { name: "Save" });
+  expect(saveButton).not.toBeDisabled();
+});
+
 test("shows a save error via toast and keeps the attempted edit on screen", async () => {
   const fetchMock = vi.fn((url: string, init?: RequestInit) => {
     if (!init || init.method === undefined) {
