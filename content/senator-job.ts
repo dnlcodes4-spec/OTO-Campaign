@@ -1,10 +1,12 @@
+import { getSiteContent } from "@/lib/content/site-content";
+
 export type JobSegment = {
   number: string;
   title: string;
   detail: string;
 };
 
-export const senatorJobContent = {
+export const senatorJobContentDefault = {
   intro:
     "People look at the Senate and say the job should be part-time. That is a job-description problem, not a workload problem. The work divides into four measurable segments.",
   segments: [
@@ -36,3 +38,7 @@ export const senatorJobContent = {
   challenge:
     "Now ask: which of these has the current crop done satisfactorily? And if those who did nothing in the House of Representatives are attempting the Senate, ask exactly what they will do differently.",
 };
+
+export async function getSenatorJobContent() {
+  return getSiteContent("senator-job", senatorJobContentDefault);
+}

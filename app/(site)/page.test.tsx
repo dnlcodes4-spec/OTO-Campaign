@@ -18,10 +18,19 @@ vi.mock("@/content/site", async () => {
   };
 });
 
+vi.mock("@/content/senator-job", async () => {
+  const actual = await vi.importActual<typeof import("@/content/senator-job")>("@/content/senator-job");
+  return {
+    ...actual,
+    getSenatorJobContent: async () => actual.senatorJobContentDefault,
+  };
+});
+
 import HomePage from "./page";
 import { aboutContent } from "@/content/about";
 import { getInvolvedContent } from "@/content/get-involved";
 import { siteContentDefault } from "@/content/site";
+import { senatorJobContentDefault } from "@/content/senator-job";
 import { watchContent } from "@/content/watch";
 
 // Same values as the `@/content/home` mock above (kept separate to avoid
@@ -132,6 +141,22 @@ describe("Home page", () => {
     expect(hero?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
     const targets = screen.getByText("1,000,000").closest("section");
     expect(targets?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
+  });
+
+  test("lays out the senator-job segments from the fetched content", async () => {
+    render(await HomePage());
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "So what does a senator actually do all day?",
+      })
+    ).toBeInTheDocument();
+    for (const segment of senatorJobContentDefault.segments) {
+      expect(
+        screen.getByRole("heading", { level: 3, name: segment.title })
+      ).toBeInTheDocument();
+    }
+    expect(screen.getByText(senatorJobContentDefault.challenge)).toBeInTheDocument();
   });
 
   test("the film plane features the current clip as a facade, no embed until pressed", async () => {

@@ -11,6 +11,7 @@ import { GetInvolvedBlock } from "@/components/sections/GetInvolvedBlock";
 import { VoteTargets } from "@/components/sections/VoteTargets";
 import { getHomeContent } from "@/content/home";
 import { getSiteContentData } from "@/content/site";
+import { getSenatorJobContent } from "@/content/senator-job";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -48,6 +49,7 @@ function PlaneCut({ from, to }: { from: PlaneTone; to: PlaneTone }) {
 export default async function HomePage() {
   const homeContent = await getHomeContent();
   const { partyLogo } = await getSiteContentData();
+  const senatorJobContent = await getSenatorJobContent();
   return (
     <>
       <Section tone="green">
@@ -71,7 +73,11 @@ export default async function HomePage() {
       <PlaneCut from="ink" to="surface" />
       <Section>
         <PledgeGrid />
-        <SenatorJob />
+        <SenatorJob
+          intro={senatorJobContent.intro}
+          segments={senatorJobContent.segments}
+          challenge={senatorJobContent.challenge}
+        />
       </Section>
       {/*
        * The film plane: the written case is complete, so the candidate makes
