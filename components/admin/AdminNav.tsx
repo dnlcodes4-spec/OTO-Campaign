@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/admins", label: "Admins" },
   { href: "/admin/gallery", label: "Gallery" },
+  { href: "/admin/content", label: "Content" },
 ];
 
 function isActive(pathname: string, href: string): boolean {
