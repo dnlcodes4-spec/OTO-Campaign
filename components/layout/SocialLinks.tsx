@@ -62,11 +62,22 @@ export function SocialLinks({
 }: SocialLinksProps) {
   return (
     <div className={`flex items-center ${className}`}>
-      {socials.map((social) => {
+      {socials.map((social, index) => {
         const Mark = MARKS[social.platform];
+        /*
+         * getSiteContentData() (content/site.ts) already filters out any
+         * social entry with a missing/unrecognized `platform` before it
+         * gets here, but this stays as a second line of defense in case a
+         * future call path ever bypasses that function - an undefined
+         * `Mark` would otherwise throw ("Element type is invalid") and take
+         * down every page that renders Nav/Footer. The array index backs
+         * the key here (rather than `social.platform`, which would be
+         * `undefined` for exactly the malformed item this guards against).
+         */
+        if (!Mark) return null;
         return (
           <a
-            key={social.platform}
+            key={social.platform ?? index}
             href={social.href}
             target="_blank"
             rel="noopener noreferrer"

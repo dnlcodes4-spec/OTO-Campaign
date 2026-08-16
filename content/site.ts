@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getSiteContent } from "@/lib/content/site-content";
 
 export type SocialPlatform = "facebook" | "twitter" | "instagram" | "youtube";
@@ -7,6 +8,26 @@ export type SocialLink = {
   label: string;
   href: string;
 };
+
+const KNOWN_PLATFORMS: readonly SocialPlatform[] = ["facebook", "twitter", "instagram", "youtube"];
+
+/*
+ * `content/schemas/site.ts` deliberately leaves `platform` out of the
+ * socials list-item schema (it's meant to stay a fixed, non-editable key),
+ * which means `SchemaForm`'s generic list "Add" button - which always
+ * appends an empty `{}` - produces a social entry with no `platform` at
+ * all. `getSiteContent`'s deep merge replaces arrays wholesale rather than
+ * merging item-by-item, so a malformed entry like that would otherwise
+ * reach every consumer of this function unmodified and crash
+ * `SocialLinks.tsx` (`MARKS[undefined]` is `undefined`, and rendering an
+ * undefined component throws). Filter here, at the source, so nothing that
+ * calls `getSiteContentData()` - now or in the future - can receive one.
+ */
+function isKnownSocialLink(social: unknown): social is SocialLink {
+  if (!social || typeof social !== "object") return false;
+  const platform = (social as { platform?: unknown }).platform;
+  return typeof platform === "string" && (KNOWN_PLATFORMS as readonly string[]).includes(platform);
+}
 
 /*
  * Site-wide identity assets. The round green mark always appears beside the
@@ -46,6 +67,16 @@ export const siteContentDefault = {
   ] as SocialLink[],
 };
 
-export async function getSiteContentData() {
-  return getSiteContent("site", siteContentDefault);
-}
+/*
+ * Wrapped in React's cache() so multiple call sites within the same
+ * request/render pass (app/(site)/layout.tsx, app/(site)/page.tsx,
+ * Footer.tsx) share one underlying Supabase query instead of each issuing
+ * their own round trip for the same row.
+ */
+export const getSiteContentData = cache(async () => {
+  const content = await getSiteContent("site", siteContentDefault);
+  return {
+    ...content,
+    socials: content.socials.filter(isKnownSocialLink),
+  };
+});
