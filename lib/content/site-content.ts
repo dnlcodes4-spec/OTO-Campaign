@@ -2,8 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { isNextInternalSignal } from "@/lib/next-internal-errors";
 
 export function deepMergeContent<T>(dbValue: unknown, fallback: T): T {
-  if (dbValue === undefined) return fallback;
-  if (dbValue === null || typeof dbValue !== "object" || Array.isArray(dbValue)) {
+  if (dbValue === undefined || dbValue === null) return fallback;
+  if (typeof dbValue !== "object" || Array.isArray(dbValue)) {
     return dbValue as T;
   }
   if (fallback === null || typeof fallback !== "object" || Array.isArray(fallback)) {

@@ -37,13 +37,22 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ke
     return NextResponse.json({ error: "Unknown content key" }, { status: 404 });
   }
 
-  const body = await request.json();
-  const { content } = body as { content?: unknown };
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const { content } = (body ?? {}) as { content?: unknown };
+  if (content === null || typeof content !== "object" || Array.isArray(content)) {
+    return NextResponse.json({ error: "content must be an object" }, { status: 400 });
+  }
 
   const adminClient = createAdminClient();
   const { data, error } = await adminClient
     .from("oto_site_content")
-    .upsert({ key, content, updated_by: authz.actingAdminId })
+    .upsert({ key, content, updated_by: authz.actingAdminId, updated_at: new Date().toISOString() })
     .select("content")
     .single();
 

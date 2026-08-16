@@ -10,7 +10,7 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: () => createClientMock(),
 }));
 
-import { getSiteContent } from "./site-content";
+import { deepMergeContent, getSiteContent } from "./site-content";
 
 beforeEach(() => {
   maybeSingleMock.mockReset();
@@ -70,6 +70,18 @@ test("a list/array field from the DB replaces the fallback array wholesale, not 
   });
   const fallback = { points: ["First default point", "Second default point"] };
   await expect(getSiteContent("home", fallback)).resolves.toEqual({ points: ["Only one edited point"] });
+});
+
+test("deepMergeContent: a null nested DB value falls back to the fallback's value at that key, not null", () => {
+  const fallback = { portrait: { src: "/images/x.png", alt: "Default alt" } };
+  expect(deepMergeContent({ portrait: { alt: null } }, fallback)).toEqual({
+    portrait: { src: "/images/x.png", alt: "Default alt" },
+  });
+});
+
+test("deepMergeContent: a top-level null dbValue returns the fallback entirely", () => {
+  const fallback = { headline: "Default headline", intro: "Default intro" };
+  expect(deepMergeContent(null, fallback)).toEqual(fallback);
 });
 
 test("uses the row's own key filter and the oto_site_content table", async () => {

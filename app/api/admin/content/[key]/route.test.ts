@@ -92,9 +92,58 @@ test("PATCH upserts the row and returns the saved content", async () => {
     key: "home",
     content: { headline: "Saved headline" },
     updated_by: "user-1",
+    updated_at: expect.any(String),
   });
   const body = await response.json();
   expect(body.content).toEqual({ headline: "Saved headline" });
+});
+
+test("PATCH rejects an unparseable JSON body", async () => {
+  authorizeAdminRequestMock.mockResolvedValue({ authorized: true, actingAdminId: "user-1" });
+  const response = await PATCH(
+    new Request("http://localhost/api/admin/content/home", {
+      method: "PATCH",
+      body: "not json",
+    }),
+    { params: Promise.resolve({ key: "home" }) }
+  );
+  expect(response.status).toBe(400);
+});
+
+test("PATCH rejects a content value that is a string", async () => {
+  authorizeAdminRequestMock.mockResolvedValue({ authorized: true, actingAdminId: "user-1" });
+  const response = await PATCH(
+    new Request("http://localhost/api/admin/content/home", {
+      method: "PATCH",
+      body: JSON.stringify({ content: "a string" }),
+    }),
+    { params: Promise.resolve({ key: "home" }) }
+  );
+  expect(response.status).toBe(400);
+});
+
+test("PATCH rejects a null content value", async () => {
+  authorizeAdminRequestMock.mockResolvedValue({ authorized: true, actingAdminId: "user-1" });
+  const response = await PATCH(
+    new Request("http://localhost/api/admin/content/home", {
+      method: "PATCH",
+      body: JSON.stringify({ content: null }),
+    }),
+    { params: Promise.resolve({ key: "home" }) }
+  );
+  expect(response.status).toBe(400);
+});
+
+test("PATCH rejects a body with no content key", async () => {
+  authorizeAdminRequestMock.mockResolvedValue({ authorized: true, actingAdminId: "user-1" });
+  const response = await PATCH(
+    new Request("http://localhost/api/admin/content/home", {
+      method: "PATCH",
+      body: JSON.stringify({}),
+    }),
+    { params: Promise.resolve({ key: "home" }) }
+  );
+  expect(response.status).toBe(400);
 });
 
 test("PATCH returns 500 on a database error", async () => {
