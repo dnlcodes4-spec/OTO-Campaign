@@ -15,6 +15,7 @@ import { getSenatorJobContent } from "@/content/senator-job";
 import { getWatchContent, watchContentDefault } from "@/content/watch";
 import { getAboutContent } from "@/content/about";
 import { getGetInvolvedContent } from "@/content/get-involved";
+import { getAtunlutoContent } from "@/content/atunluto";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -56,6 +57,7 @@ export default async function HomePage() {
   const watchContent = await getWatchContent();
   const aboutContent = await getAboutContent();
   const getInvolvedContent = await getGetInvolvedContent();
+  const atunlutoContent = await getAtunlutoContent();
   return (
     <>
       <Section tone="green">
@@ -81,7 +83,15 @@ export default async function HomePage() {
           tieUps={aboutContent.tieUps}
         />
         <StoryTeaser />
-        <AtunlutoBlock />
+        <AtunlutoBlock
+          answer={atunlutoContent.answer}
+          caucusLine={atunlutoContent.caucusLine}
+          model={atunlutoContent.model}
+          stats={atunlutoContent.stats}
+          running={atunlutoContent.running}
+          pillars={atunlutoContent.pillars}
+          link={atunlutoContent.link}
+        />
       </Section>
       <PlaneCut from="surface" to="ink" />
       <Section id="agenda" tone="ink">
