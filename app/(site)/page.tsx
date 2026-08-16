@@ -53,15 +53,27 @@ function PlaneCut({ from, to }: { from: PlaneTone; to: PlaneTone }) {
 }
 
 export default async function HomePage() {
-  const homeContent = await getHomeContent();
-  const { partyLogo } = await getSiteContentData();
-  const senatorJobContent = await getSenatorJobContent();
-  const watchContent = await getWatchContent();
-  const aboutContent = await getAboutContent();
-  const getInvolvedContent = await getGetInvolvedContent();
-  const atunlutoContent = await getAtunlutoContent();
-  const storyContent = await getStoryContent();
-  const agendaContent = await getAgendaContent();
+  const [
+    homeContent,
+    { partyLogo },
+    senatorJobContent,
+    watchContent,
+    aboutContent,
+    getInvolvedContent,
+    atunlutoContent,
+    storyContent,
+    agendaContent,
+  ] = await Promise.all([
+    getHomeContent(),
+    getSiteContentData(),
+    getSenatorJobContent(),
+    getWatchContent(),
+    getAboutContent(),
+    getGetInvolvedContent(),
+    getAtunlutoContent(),
+    getStoryContent(),
+    getAgendaContent(),
+  ]);
   return (
     <>
       <Section tone="green">
