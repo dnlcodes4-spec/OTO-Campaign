@@ -76,7 +76,49 @@ function FieldControl({
     );
   }
 
-  // Remaining field types (list, optional, image) are added in later tasks.
+  if (field.type === "list") {
+    const items = Array.isArray(value) ? value : [];
+    const emptyItem = field.item.type === "group" ? {} : "";
+    const itemLabel = field.item.type === "optional" ? field.label : field.item.label;
+
+    return (
+      <div className="flex flex-col gap-3">
+        <p className="text-sm font-body font-medium text-ink">{field.label}</p>
+        {items.map((item, index) => (
+          <div key={index} className="flex items-start gap-3">
+            <div className="flex-1">
+              <FieldControl
+                field={field.item}
+                path={`${path}[${index}]`}
+                value={item}
+                onChange={(next) => {
+                  const updated = [...items];
+                  updated[index] = next;
+                  onChange(updated);
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => onChange(items.filter((_, i) => i !== index))}
+              className="text-sm font-body text-brand-red underline"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => onChange([...items, emptyItem])}
+          className="self-start border border-ink/20 px-4 py-2 text-sm font-body text-ink transition-colors hover:border-ink/40"
+        >
+          Add {itemLabel}
+        </button>
+      </div>
+    );
+  }
+
+  // Remaining field types (optional, image) are added in later tasks.
   return null;
 }
 

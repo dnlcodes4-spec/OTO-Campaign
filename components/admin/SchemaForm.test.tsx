@@ -58,4 +58,99 @@ describe("SchemaForm", () => {
     render(<SchemaForm schema={schema} value={{ headline: "x" }} onChange={vi.fn()} />);
     expect(screen.queryByRole("heading", { name: "Home" })).not.toBeInTheDocument();
   });
+
+  test("renders a string list with one input per item, and can add a new item", () => {
+    const schema: Field = {
+      type: "group",
+      label: "About",
+      fields: { record: { type: "list", label: "Record", item: { type: "text", label: "Point" } } },
+    };
+    const onChange = vi.fn();
+    render(<SchemaForm schema={schema} value={{ record: ["First point", "Second point"] }} onChange={onChange} />);
+
+    const inputs = screen.getAllByLabelText("Point");
+    expect(inputs).toHaveLength(2);
+    expect(inputs[0]).toHaveValue("First point");
+
+    fireEvent.click(screen.getByRole("button", { name: "Add Point" }));
+    expect(onChange).toHaveBeenCalledWith({ record: ["First point", "Second point", ""] });
+  });
+
+  test("removes a string list item", () => {
+    const schema: Field = {
+      type: "group",
+      label: "About",
+      fields: { record: { type: "list", label: "Record", item: { type: "text", label: "Point" } } },
+    };
+    const onChange = vi.fn();
+    render(<SchemaForm schema={schema} value={{ record: ["First point", "Second point"] }} onChange={onChange} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Remove" })[0]);
+    expect(onChange).toHaveBeenCalledWith({ record: ["Second point"] });
+  });
+
+  test("edits a specific item within a string list", () => {
+    const schema: Field = {
+      type: "group",
+      label: "About",
+      fields: { record: { type: "list", label: "Record", item: { type: "text", label: "Point" } } },
+    };
+    const onChange = vi.fn();
+    render(<SchemaForm schema={schema} value={{ record: ["First point", "Second point"] }} onChange={onChange} />);
+
+    fireEvent.change(screen.getAllByLabelText("Point")[1], { target: { value: "Edited second" } });
+    expect(onChange).toHaveBeenCalledWith({ record: ["First point", "Edited second"] });
+  });
+
+  test("renders a repeating group list (list of objects), each with its own sub-fields", () => {
+    const schema: Field = {
+      type: "group",
+      label: "About",
+      fields: {
+        education: {
+          type: "list",
+          label: "Education",
+          item: {
+            type: "group",
+            label: "Entry",
+            fields: {
+              school: { type: "text", label: "School" },
+              period: { type: "text", label: "Period" },
+            },
+          },
+        },
+      },
+    };
+    const onChange = vi.fn();
+    render(
+      <SchemaForm
+        schema={schema}
+        value={{ education: [{ school: "FUT Minna", period: "1992/93" }] }}
+        onChange={onChange}
+      />
+    );
+
+    expect(screen.getByDisplayValue("FUT Minna")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("School"), { target: { value: "Edited school" } });
+    expect(onChange).toHaveBeenCalledWith({ education: [{ school: "Edited school", period: "1992/93" }] });
+  });
+
+  test("adding an item to a repeating group list adds an empty group, not an empty string", () => {
+    const schema: Field = {
+      type: "group",
+      label: "About",
+      fields: {
+        education: {
+          type: "list",
+          label: "Education",
+          item: { type: "group", label: "Entry", fields: { school: { type: "text", label: "School" } } },
+        },
+      },
+    };
+    const onChange = vi.fn();
+    render(<SchemaForm schema={schema} value={{ education: [] }} onChange={onChange} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Add Entry" }));
+    expect(onChange).toHaveBeenCalledWith({ education: [{}] });
+  });
 });
