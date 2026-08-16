@@ -12,7 +12,7 @@ import { VoteTargets } from "@/components/sections/VoteTargets";
 import { getHomeContent } from "@/content/home";
 import { getSiteContentData } from "@/content/site";
 import { getSenatorJobContent } from "@/content/senator-job";
-import { getWatchContent } from "@/content/watch";
+import { getWatchContent, watchContentDefault } from "@/content/watch";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -89,7 +89,20 @@ export default async function HomePage() {
       <PlaneCut from="surface" to="ink" />
       <Section id="watch" tone="ink">
         <WatchBlock
-          video={watchContent.video}
+          /*
+           * video is deliberately sourced from watchContentDefault, not
+           * from watchContent (getWatchContent()'s CMS-merged result).
+           * video is excluded from watchSchema, so SchemaForm never renders
+           * a control for it, but SchemaForm's save path spreads the whole
+           * loaded record forward on every edit, so a Watch content save
+           * from /admin/content/watch could still persist a stray `video`
+           * key into the oto_site_content row. Reading it from the
+           * hardcoded default here keeps that scenario harmless: whatever
+           * lands in the DB row is never read back out for rendering, and
+           * "swap the value in content/watch.ts" stays the entire release
+           * for this field regardless of what SchemaForm ever saves.
+           */
+          video={watchContentDefault.video}
           title={watchContent.title}
           answer={watchContent.answer}
           body={watchContent.body}

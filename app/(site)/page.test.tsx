@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 
 vi.mock("@/content/home", () => ({
@@ -26,11 +26,20 @@ vi.mock("@/content/senator-job", async () => {
   };
 });
 
+/*
+ * getWatchContent is mocked through a controllable vi.fn() (reset to
+ * resolve watchContentDefault in beforeEach below) rather than a fixed
+ * async function, so a single test below can make it resolve a *poisoned*
+ * merged result — video overridden away from watchContentDefault.video, the
+ * shape a stray DB write could actually produce — and assert page.tsx does
+ * not let that value reach the rendered film plane.
+ */
+const getWatchContentMock = vi.fn();
 vi.mock("@/content/watch", async () => {
   const actual = await vi.importActual<typeof import("@/content/watch")>("@/content/watch");
   return {
     ...actual,
-    getWatchContent: async () => actual.watchContentDefault,
+    getWatchContent: () => getWatchContentMock(),
   };
 });
 
@@ -55,6 +64,11 @@ function getSection(container: HTMLElement, id: string) {
   expect(section).not.toBeNull();
   return section as HTMLElement;
 }
+
+beforeEach(() => {
+  getWatchContentMock.mockReset();
+  getWatchContentMock.mockResolvedValue(watchContentDefault);
+});
 
 describe("Home page", () => {
   test("renders the poster headline", async () => {
@@ -179,6 +193,46 @@ describe("Home page", () => {
     expect(container.querySelector("iframe")).toBeNull();
     expect(container.querySelector("video")).toBeNull();
     expect(within(watch).getByRole("button", { name: `Play the film: ${watchContentDefault.title}` })).toBeInTheDocument();
+  });
+
+  test("the video prop stays sourced from watchContentDefault even if a poisoned/merged CMS row returns a different video", async () => {
+    /*
+     * Simulates the real failure mode: video is deliberately absent from
+     * watchSchema so SchemaForm never renders a control for it, but
+     * SchemaForm's save path spreads the *entire* loaded record forward on
+     * every edit (Task 2's setKey design), so saving any other Watch field
+     * from /admin/content/watch could persist a stray `video` key into the
+     * oto_site_content row. From then on getWatchContent()'s merged result
+     * would carry that DB value instead of the code default. This test
+     * stands in for that poisoned row without touching the DB: it makes
+     * getWatchContent() resolve a merged object whose `video` differs from
+     * watchContentDefault.video, then asserts the *rendered* film plane
+     * still reflects the hardcoded default, not the merged value.
+     */
+    const expectedVideo = watchContentDefault.video;
+    if (!expectedVideo || expectedVideo.type !== "direct") {
+      throw new Error(
+        "This test assumes watchContentDefault.video is currently a 'direct' Cloudinary clip; update its assertions if that default ever changes."
+      );
+    }
+
+    getWatchContentMock.mockResolvedValue({
+      ...watchContentDefault,
+      video: { type: "youtube", videoId: "poisoned-video-id-should-never-render" },
+    });
+
+    const { container } = render(await HomePage());
+    const watch = getSection(container, "watch");
+
+    // The poisoned YouTube facade must never reach the DOM...
+    expect(container.querySelector('img[src*="i.ytimg.com"]')).toBeNull();
+    expect(
+      container.querySelector('img[src*="poisoned-video-id-should-never-render"]')
+    ).toBeNull();
+
+    // ...only the real, hardcoded default clip should render.
+    const poster = within(watch).getByAltText(watchContentDefault.title);
+    expect(poster).toHaveAttribute("src", expectedVideo.poster);
   });
 
   test("get involved carries the asks and the single vote target", async () => {
