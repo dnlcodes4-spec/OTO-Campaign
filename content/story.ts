@@ -2,7 +2,7 @@ import { getSiteContent } from "@/lib/content/site-content";
 
 export type StorySection = {
   heading: string;
-  body: string[];
+  body?: string[];
 };
 
 /*

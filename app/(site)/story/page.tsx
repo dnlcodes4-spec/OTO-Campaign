@@ -41,7 +41,7 @@ export default async function StoryPage() {
               <Heading level={2} sizeOverride="text-3xl sm:text-4xl leading-[1.02] tracking-tight">
                 {section.heading}
               </Heading>
-              {section.body.map((paragraph) => (
+              {(section.body ?? []).map((paragraph) => (
                 <p
                   key={paragraph}
                   className="mt-5 font-body text-base leading-relaxed text-ink/75 sm:text-lg"

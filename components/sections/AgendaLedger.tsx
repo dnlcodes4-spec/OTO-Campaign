@@ -35,7 +35,7 @@ const PICTOGRAMS: Record<string, (props: PictogramProps) => React.ReactNode> = {
 };
 
 function AgendaItemRow({ item }: { item: AgendaItem }) {
-  const Pictogram = PICTOGRAMS[item.number];
+  const Pictogram = item.number ? PICTOGRAMS[item.number] : undefined;
   return (
     <article className="border-t border-ink-inverse/20 py-10 sm:py-12 lg:py-16">
       <div className="grid gap-x-10 gap-y-4 lg:grid-cols-12">

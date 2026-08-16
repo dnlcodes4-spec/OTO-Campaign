@@ -2,11 +2,11 @@ import { getSiteContent } from "@/lib/content/site-content";
 
 export type AgendaRoute = {
   title: string;
-  points: string[];
+  points?: string[];
 };
 
 export type AgendaItem = {
-  number: string;
+  number?: string;
   title: string;
   thesis: string;
   points?: string[];
@@ -15,7 +15,7 @@ export type AgendaItem = {
 };
 
 export type Pledge = {
-  title: string;
+  title?: string;
   detail: string;
 };
 
