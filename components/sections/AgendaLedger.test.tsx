@@ -1,10 +1,11 @@
 import { describe, expect, test } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AgendaLedger } from "./AgendaLedger";
+import { agendaContentDefault } from "@/content/agenda";
 
 describe("AgendaLedger", () => {
   test("draws a custom pictogram for each of the six legislative items", () => {
-    render(<AgendaLedger />);
+    render(<AgendaLedger intro={agendaContentDefault.intro} items={agendaContentDefault.items} />);
     for (const id of [
       "pictogram-state-police",
       "pictogram-residency",
@@ -18,7 +19,7 @@ describe("AgendaLedger", () => {
   });
 
   test("pictograms are decorative and inherit color from the plane", () => {
-    render(<AgendaLedger />);
+    render(<AgendaLedger intro={agendaContentDefault.intro} items={agendaContentDefault.items} />);
     for (const id of [
       "pictogram-state-police",
       "pictogram-residency",

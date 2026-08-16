@@ -15,6 +15,8 @@ import { atunlutoSchema } from "./atunluto";
 import { atunlutoContentDefault } from "@/content/atunluto";
 import { storySchema } from "./story";
 import { storyContentDefault } from "@/content/story";
+import { agendaSchema } from "./agenda";
+import { agendaContentDefault } from "@/content/agenda";
 
 /*
  * One entry per editable content file. Each content task (see the CMS
@@ -61,5 +63,10 @@ export const CONTENT_REGISTRY: Record<string, { label: string; schema: Field; de
     label: "Story",
     schema: storySchema,
     defaultValue: storyContentDefault,
+  },
+  agenda: {
+    label: "Agenda",
+    schema: agendaSchema,
+    defaultValue: agendaContentDefault,
   },
 };

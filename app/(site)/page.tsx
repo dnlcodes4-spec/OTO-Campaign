@@ -17,6 +17,7 @@ import { getAboutContent } from "@/content/about";
 import { getGetInvolvedContent } from "@/content/get-involved";
 import { getAtunlutoContent } from "@/content/atunluto";
 import { getStoryContent } from "@/content/story";
+import { getAgendaContent } from "@/content/agenda";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -60,6 +61,7 @@ export default async function HomePage() {
   const getInvolvedContent = await getGetInvolvedContent();
   const atunlutoContent = await getAtunlutoContent();
   const storyContent = await getStoryContent();
+  const agendaContent = await getAgendaContent();
   return (
     <>
       <Section tone="green">
@@ -101,11 +103,15 @@ export default async function HomePage() {
       </Section>
       <PlaneCut from="surface" to="ink" />
       <Section id="agenda" tone="ink">
-        <AgendaLedger />
+        <AgendaLedger intro={agendaContent.intro} items={agendaContent.items} />
       </Section>
       <PlaneCut from="ink" to="surface" />
       <Section>
-        <PledgeGrid />
+        <PledgeGrid
+          pledgesPull={agendaContent.pledgesPull}
+          pledgesIntro={agendaContent.pledgesIntro}
+          pledges={agendaContent.pledges}
+        />
         <SenatorJob
           intro={senatorJobContent.intro}
           segments={senatorJobContent.segments}
