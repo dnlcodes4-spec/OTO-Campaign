@@ -768,7 +768,7 @@ git commit -m "feat: add oto_site_content table and public-read RLS policy"
 
 **Interfaces:**
 - Consumes: `createClient` from `lib/supabase/server.ts`, `isNextInternalSignal` from `lib/next-internal-errors.ts`.
-- Produces: `getSiteContent<T>(key: string, fallback: T): Promise<T>`. Consumed by every content file's `getXContent()` (Tasks 12-20) and the admin content API routes (Task 9).
+- Produces: `getSiteContent<T>(key: string, fallback: T): Promise<T>` and `deepMergeContent<T>(dbValue: unknown, fallback: T): T` (exported so Task 9's API route reuses the same merge logic instead of reimplementing it). Consumed by every content file's `getXContent()` (Tasks 12-20) and the admin content API routes (Task 9).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -869,7 +869,7 @@ Expected: FAIL, "Cannot find module './site-content'"
 import { createClient } from "@/lib/supabase/server";
 import { isNextInternalSignal } from "@/lib/next-internal-errors";
 
-function deepMergeContent<T>(dbValue: unknown, fallback: T): T {
+export function deepMergeContent<T>(dbValue: unknown, fallback: T): T {
   if (dbValue === undefined) return fallback;
   if (dbValue === null || typeof dbValue !== "object" || Array.isArray(dbValue)) {
     return dbValue as T;
@@ -1014,7 +1014,7 @@ git commit -m "feat: let the Cloudinary sign route target a specific upload fold
 - Test: `app/api/admin/content/[key]/route.test.ts`
 
 **Interfaces:**
-- Consumes: `Field` from `content/schema-types.ts`, `authorizeAdminRequest`, `createAdminClient` from `lib/supabase/admin.ts`.
+- Consumes: `Field` from `content/schema-types.ts`, `authorizeAdminRequest`, `createAdminClient` from `lib/supabase/admin.ts`, `deepMergeContent` from `lib/content/site-content.ts` (Task 7 — do not reimplement the merge logic here).
 - Produces: `CONTENT_REGISTRY: Record<string, { label: string; schema: Field; defaultValue: unknown }>` (starts with a placeholder `home` entry here; Tasks 12-20 each add their own real entry, replacing the placeholder for `home` in Task 12). `GET /api/admin/content/[key]` returns `{ content }` (merged, same shape the public site sees). `PATCH /api/admin/content/[key]` accepts `{ content }`, upserts, returns `{ content }`. Consumed by Task 10 (content list page) and Task 11 (editor page).
 
 - [ ] **Step 1: Write the placeholder registry**
@@ -1166,21 +1166,7 @@ import { NextResponse } from "next/server";
 import { authorizeAdminRequest } from "@/lib/admin/authorize";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CONTENT_REGISTRY } from "@/content/schemas/registry";
-
-function deepMergeContent(dbValue: unknown, fallback: unknown): unknown {
-  if (dbValue === undefined) return fallback;
-  if (dbValue === null || typeof dbValue !== "object" || Array.isArray(dbValue)) return dbValue;
-  if (fallback === null || typeof fallback !== "object" || Array.isArray(fallback)) return fallback;
-
-  const result: Record<string, unknown> = { ...(fallback as Record<string, unknown>) };
-  for (const key of Object.keys(dbValue as Record<string, unknown>)) {
-    result[key] = deepMergeContent(
-      (dbValue as Record<string, unknown>)[key],
-      (fallback as Record<string, unknown>)[key]
-    );
-  }
-  return result;
-}
+import { deepMergeContent } from "@/lib/content/site-content";
 
 export async function GET(request: Request, { params }: { params: Promise<{ key: string }> }) {
   const authz = await authorizeAdminRequest(request);
@@ -1709,19 +1695,20 @@ Expected: PASS (1 test)
 ```tsx
 render(await HomePage());
 ```
-(This matches how the gallery page's own tests, if any render the page directly, would need to handle an async Server Component — check `app/(site)/gallery/page.tsx` for precedent; if it's tested only through `GalleryGrid` directly rather than the page itself, `page.test.tsx` here is the first async-page test and this pattern is new for `content/gallery.ts`'s pattern is via a separately-tested `getGalleryItems()`, not the page component itself, but Home's page test renders the page component directly, hence this adjustment.)
+This exact pattern (`render(await Component())` for an async Server Component) is already established in this codebase — see `app/admin/(protected)/page.test.tsx`, which does the same thing against `AdminDashboardPage()`. Follow that file's shape.
 
 Also mock `@/content/home` at the top of `app/(site)/page.test.tsx` so the test doesn't depend on live Supabase / `next/headers`:
 ```tsx
 vi.mock("@/content/home", () => ({
   getHomeContent: async () => ({
     headline: "Send someone who actually shows up.",
-    intro: "...",
+    intro:
+      "Many Nigerians have yearned, thirsted and hungered for a change, but after all is said and done, they join the bandwagon and vote for the same. That was exactly what went wrong about eight years ago. This time, ask the questions first: why should we send you to Abuja, what do you have in mind for us, what pedigree do you have.",
     portrait: { src: "/images/oto-native.png", alt: "OTO, Oluwasegun Theophilus Oladimeji, in gold agbada and fila" },
   }),
 }));
 ```
-Place this mock before the `import HomePage from "./page"` line, and keep the mocked `intro`/`headline`/`portrait.alt` values byte-for-byte identical to `homeContentDefault` in `content/home.ts`, since existing assertions in this test file check for that exact text.
+Place this mock before the `import HomePage from "./page"` line. These values are copied verbatim from `homeContentDefault` in `content/home.ts` (Step 3 above) — existing assertions in this test file check for this exact text, so the mock must match it exactly.
 
 - [ ] **Step 6: Run the full test suite to check nothing else broke**
 
