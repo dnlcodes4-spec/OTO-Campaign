@@ -111,10 +111,15 @@ function FieldControl({
             </div>
             <button
               type="button"
-              onClick={() => onChange(items.filter((_, i) => i !== index))}
+              onClick={() => {
+                if (field.item.type === "group" && !window.confirm(`Remove this ${itemLabel}? This can't be undone.`)) {
+                  return;
+                }
+                onChange(items.filter((_, i) => i !== index));
+              }}
               className="text-sm font-body text-brand-red underline"
             >
-              Remove
+              Remove {itemLabel}
             </button>
           </div>
         ))}

@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SchemaForm } from "./SchemaForm";
 import type { Field } from "@/content/schema-types";
@@ -85,7 +85,7 @@ describe("SchemaForm", () => {
     const onChange = vi.fn();
     render(<SchemaForm schema={schema} value={{ record: ["First point", "Second point"] }} onChange={onChange} />);
 
-    fireEvent.click(screen.getAllByRole("button", { name: "Remove" })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: "Remove Point" })[0]);
     expect(onChange).toHaveBeenCalledWith({ record: ["Second point"] });
   });
 
@@ -152,6 +152,74 @@ describe("SchemaForm", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Add Entry" }));
     expect(onChange).toHaveBeenCalledWith({ education: [{}] });
+  });
+
+  test("a list-of-group item's remove button reads Remove {group's label}", () => {
+    const schema: Field = {
+      type: "group",
+      label: "State police",
+      fields: {
+        routes: {
+          type: "list",
+          label: "Routes",
+          item: {
+            type: "group",
+            label: "Route",
+            fields: { title: { type: "text", label: "Title" } },
+          },
+        },
+      },
+    };
+    render(<SchemaForm schema={schema} value={{ routes: [{ title: "Negotiate the caucuses" }] }} onChange={vi.fn()} />);
+
+    expect(screen.getByRole("button", { name: "Remove Route" })).toBeInTheDocument();
+  });
+
+  describe("removing a list-of-group item", () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    const schema: Field = {
+      type: "group",
+      label: "State police",
+      fields: {
+        routes: {
+          type: "list",
+          label: "Routes",
+          item: {
+            type: "group",
+            label: "Route",
+            fields: { title: { type: "text", label: "Title" } },
+          },
+        },
+      },
+    };
+
+    test("confirms via window.confirm and does not call onChange when declined", () => {
+      vi.spyOn(window, "confirm").mockReturnValue(false);
+      const onChange = vi.fn();
+      render(
+        <SchemaForm schema={schema} value={{ routes: [{ title: "Negotiate the caucuses" }] }} onChange={onChange} />
+      );
+
+      fireEvent.click(screen.getByRole("button", { name: "Remove Route" }));
+
+      expect(window.confirm).toHaveBeenCalledWith("Remove this Route? This can't be undone.");
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    test("calls onChange with the item removed when confirmed", () => {
+      vi.spyOn(window, "confirm").mockReturnValue(true);
+      const onChange = vi.fn();
+      render(
+        <SchemaForm schema={schema} value={{ routes: [{ title: "Negotiate the caucuses" }] }} onChange={onChange} />
+      );
+
+      fireEvent.click(screen.getByRole("button", { name: "Remove Route" }));
+
+      expect(onChange).toHaveBeenCalledWith({ routes: [] });
+    });
   });
 
   test("an absent optional field shows an add control instead of its inner field", () => {
