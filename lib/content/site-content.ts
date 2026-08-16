@@ -1,6 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { isNextInternalSignal } from "@/lib/next-internal-errors";
 
+/*
+ * Every content key registered in content/schemas/registry.ts has a seeded
+ * row in the oto_site_content table in production. For any field an admin
+ * has ever saved, the database value wins over the *Default object in the
+ * matching content/*.ts file — editing that file's defaults changes what an
+ * empty/unseeded table falls back to, not what's currently live. The
+ * *Default objects remain the schema-shape source of truth and the
+ * first-boot fallback.
+ */
 export function deepMergeContent<T>(dbValue: unknown, fallback: T): T {
   if (dbValue === undefined || dbValue === null) return fallback;
   if (typeof dbValue !== "object" || Array.isArray(dbValue)) {

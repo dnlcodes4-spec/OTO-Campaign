@@ -44,11 +44,13 @@ function isKnownSocialLink(social: unknown): social is SocialLink {
  * card on the page's colored planes, never recolored or cropped.
  *
  * PLACEHOLDERS: the campaign's social profiles are not live yet, so every
- * href points at the platform's root. When the client shares the real
- * profile URLs, swap each href below in place, one line per platform.
- * Labels and platform keys stay as they are; every rendered row reads from
- * this array, so nothing else changes. The Twitter entry keeps "Twitter" as
- * its accessible label while the rendered glyph is the X mark.
+ * href points at the platform's root. Once this content type has ever been
+ * saved through the CMS (which is the normal path in production — every
+ * content area ships with a seeded row), the database row wins over this
+ * array entirely; editing this file alone will not change what's live.
+ * Update the real profile URLs at /admin/content/site instead. This array
+ * still matters as the shape SchemaForm renders against, and as the
+ * fallback an empty/unseeded database degrades to.
  */
 export const siteContentDefault = {
   logo: {
