@@ -1,10 +1,12 @@
+import { getSiteContent } from "@/lib/content/site-content";
+
 export type AgendaRoute = {
   title: string;
-  points: string[];
+  points?: string[];
 };
 
 export type AgendaItem = {
-  number: string;
+  number?: string;
   title: string;
   thesis: string;
   points?: string[];
@@ -13,11 +15,11 @@ export type AgendaItem = {
 };
 
 export type Pledge = {
-  title: string;
+  title?: string;
   detail: string;
 };
 
-export const agendaContent = {
+export const agendaContentDefault = {
   intro:
     "The question most people going to the Senate from Oyo South never answered before they took their seat. Little wonder their four or more years were usually uneventful, and their names are appended to no piece of legislation. So here is the agenda, in writing, before you vote.",
   items: [
@@ -151,3 +153,7 @@ export const agendaContent = {
     },
   ] as Pledge[],
 };
+
+export async function getAgendaContent() {
+  return getSiteContent("agenda", agendaContentDefault);
+}

@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { getInvolvedContent } from "@/content/get-involved";
-import { siteContent } from "@/content/site";
+import type { VoteTarget } from "@/content/get-involved";
 
 /*
  * The page ends the way the campaign document does: with the count. The
@@ -18,23 +17,40 @@ import { siteContent } from "@/content/site";
  * white card sits directly on the deep green plane with its own rounded
  * edge, the identical treatment the badge gets in the hero and footer.
  */
-export function VoteTargets() {
+type VoteTargetsProps = {
+  /*
+   * VoteTargets is nested inside HomePage's returned tree rather than being
+   * the component under direct test/render, so it stays a plain
+   * (non-async) component and takes the party badge as a prop from the
+   * page, which already awaits `getSiteContentData()` once for the route.
+   */
+  partyLogo: {
+    src: string;
+    alt: string;
+  };
+  targetsLead: string;
+  targets: VoteTarget[];
+  targetsSupport: string;
+  epigraph: string;
+};
+
+export function VoteTargets({ partyLogo, targetsLead, targets, targetsSupport, epigraph }: VoteTargetsProps) {
   return (
     <div>
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
         <Image
-          src={siteContent.partyLogo.src}
-          alt={siteContent.partyLogo.alt}
+          src={partyLogo.src}
+          alt={partyLogo.alt}
           width={186}
           height={160}
           className="order-1 h-auto w-28 self-end sm:w-36 lg:order-2 lg:w-44 lg:shrink-0 lg:self-auto"
         />
         <p className="order-2 max-w-2xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg lg:order-1">
-          {getInvolvedContent.targetsLead}
+          {targetsLead}
         </p>
       </div>
       <div className="mt-10 flex flex-col gap-10 lg:mt-14 lg:gap-14">
-        {getInvolvedContent.targets.map((target) => (
+        {targets.map((target) => (
           <div key={target.figure} className="border-t border-ink-inverse/20 pt-6 lg:w-4/5">
             <p className="font-display text-6xl font-semibold leading-none tracking-tight text-brand-gold sm:text-7xl lg:text-9xl">
               {target.figure}
@@ -46,10 +62,10 @@ export function VoteTargets() {
         ))}
       </div>
       <p className="mt-6 max-w-xl font-body text-base leading-relaxed text-ink-inverse/60">
-        {getInvolvedContent.targetsSupport}
+        {targetsSupport}
       </p>
       <p className="mt-16 max-w-3xl font-display text-xl font-medium leading-snug text-ink-inverse/60 sm:text-2xl lg:mt-24">
-        &ldquo;{getInvolvedContent.epigraph}&rdquo;
+        &ldquo;{epigraph}&rdquo;
       </p>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Heading } from "@/components/primitives/Heading";
 import { CampaignImage } from "@/components/primitives/CampaignImage";
-import { getInvolvedContent } from "@/content/get-involved";
+import type { Ask, TurnoutStat } from "@/content/get-involved";
 
 /*
  * The last question on the page turns back on the reader. The five asks run
@@ -26,7 +26,22 @@ import { getInvolvedContent } from "@/content/get-involved";
  * bottom right. On mobile the asks read first and the panel closes the
  * section the same way.
  */
-export function GetInvolvedBlock() {
+type GetInvolvedBlockProps = {
+  /*
+   * GetInvolvedBlock is nested inside HomePage's returned tree rather than
+   * being the component under direct test/render (its own test renders
+   * `<GetInvolvedBlock />` directly, but a Promise-returning component
+   * can't be resolved by React Testing Library that way), so it stays a
+   * plain (non-async) component and takes its content as props from the
+   * page, which awaits `getGetInvolvedContent()` once for the route.
+   */
+  turnoutStats: TurnoutStat[];
+  turnoutBody: string;
+  image: { src: string; alt: string };
+  asks: Ask[];
+};
+
+export function GetInvolvedBlock({ turnoutStats, turnoutBody, image, asks }: GetInvolvedBlockProps) {
   return (
     <div>
       <Heading
@@ -38,7 +53,7 @@ export function GetInvolvedBlock() {
       </Heading>
       <div className="mt-10 grid gap-x-12 gap-y-14 lg:mt-14 lg:grid-cols-12">
         <ol className="lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:flex lg:flex-col lg:justify-between">
-          {getInvolvedContent.asks.map((ask) => (
+          {asks.map((ask) => (
             <li
               key={ask.number}
               className="grid grid-cols-[auto_1fr] gap-x-6 border-t border-ink-inverse/20 py-6 sm:py-8 lg:gap-x-8"
@@ -64,7 +79,7 @@ export function GetInvolvedBlock() {
           />
           <div className="relative px-6 pb-10 pt-16 sm:px-8 sm:pt-20 lg:pt-16">
             <div className="flex flex-col gap-8">
-              {getInvolvedContent.turnoutStats.map((stat) => (
+              {turnoutStats.map((stat) => (
                 <div key={stat.figure}>
                   <p className="font-display text-5xl font-semibold leading-none tracking-tight text-brand-gold sm:text-6xl lg:text-7xl">
                     {stat.figure}
@@ -76,12 +91,12 @@ export function GetInvolvedBlock() {
               ))}
             </div>
             <p className="mt-8 border-t border-ink-inverse/20 pt-6 font-body text-base leading-relaxed text-ink-inverse/75">
-              {getInvolvedContent.turnoutBody}
+              {turnoutBody}
             </p>
           </div>
           <CampaignImage
-            src={getInvolvedContent.image.src}
-            alt={getInvolvedContent.image.alt}
+            src={image.src}
+            alt={image.alt}
             fit="cutout"
             sizes="(min-width: 1152px) 504px, (min-width: 1024px) 48vw, 100vw"
             className="relative mt-auto aspect-[1600/1235] w-full"

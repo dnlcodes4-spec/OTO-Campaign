@@ -1,3 +1,5 @@
+import { getSiteContent } from "@/lib/content/site-content";
+
 export type AtunlutoStat = {
   figure: string;
   label: string;
@@ -13,7 +15,7 @@ export type ProgrammeGroup = {
  * exactly as researched: founding date, membership, LGA spread, the
  * running interventions and the Six Pillars. Nothing is embellished.
  */
-export const atunlutoContent = {
+export const atunlutoContentDefault = {
   answer: "He is not promising one. He already built it.",
   caucusLine:
     "OTO comes to this race from the Atunluto caucus within the Zenith Labour Party: the Atunluto Group, a grassroots political association founded in Oyo State in March 2024 and focused on the Oyo South Senatorial District. Built as a resilient structure since then, it has grown into a major caucus in the Oyo Zenith Labour Party.",
@@ -53,3 +55,7 @@ export const atunlutoContent = {
     label: "atunluto.com",
   },
 };
+
+export async function getAtunlutoContent() {
+  return getSiteContent("atunluto", atunlutoContentDefault);
+}

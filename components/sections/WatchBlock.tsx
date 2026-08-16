@@ -1,7 +1,7 @@
 import { Heading } from "@/components/primitives/Heading";
 import { VideoFacade } from "./VideoFacade";
 import { VideoFacadeDirect } from "./VideoFacadeDirect";
-import { watchContent } from "@/content/watch";
+import type { VideoSource } from "@/content/watch";
 
 /*
  * The film plane sits between the pledges and the ask on purpose: by this
@@ -26,10 +26,33 @@ import { watchContent } from "@/content/watch";
  *    grammar against a self-hosted (Cloudinary) clip; play swaps it for an
  *    inline, autoplaying <video> rather than an iframe embed.
  *
- * Swapping the value in content/watch.ts is the entire release; this
- * component does not change.
+ * Swapping the video value in content/watch.ts is the entire release for
+ * that field; this component does not change. video is intentionally not
+ * part of the CMS-editable content (see content/schemas/watch.ts), so it
+ * still comes in as a plain prop sourced from watchContentDefault, not from
+ * getWatchContent()'s merged result.
  */
-export function WatchBlock() {
+type WatchBlockProps = {
+  /*
+   * WatchBlock is nested inside HomePage's returned tree rather than being
+   * the component under direct test/render (HomePage's own test renders
+   * `await HomePage()` at the top level, and a Promise-returning component
+   * nested inside that already-constructed tree can't be resolved by
+   * React Testing Library), so it stays a plain (non-async) component and
+   * takes its content as props from the page, which awaits
+   * `getWatchContent()` once for the route.
+   */
+  video: VideoSource | null;
+  title: string;
+  answer: string;
+  body: string;
+  coming: {
+    line: string;
+    detail: string;
+  };
+};
+
+export function WatchBlock({ video, title, answer, body, coming }: WatchBlockProps) {
   return (
     <div>
       <Heading
@@ -42,22 +65,18 @@ export function WatchBlock() {
 
       <div className="mt-8 grid gap-x-12 gap-y-6 lg:mt-12 lg:grid-cols-12 lg:items-baseline">
         <p className="font-display text-3xl font-semibold leading-[1.05] tracking-tight text-brand-gold sm:text-4xl lg:col-span-5">
-          {watchContent.answer}
+          {answer}
         </p>
         <p className="max-w-xl font-body text-base leading-relaxed text-ink-inverse/75 lg:col-span-7">
-          {watchContent.body}
+          {body}
         </p>
       </div>
 
       <div className="mt-10 lg:mt-14">
-        {watchContent.video?.type === "youtube" ? (
-          <VideoFacade videoId={watchContent.video.videoId} title={watchContent.title} />
-        ) : watchContent.video?.type === "direct" ? (
-          <VideoFacadeDirect
-            src={watchContent.video.src}
-            poster={watchContent.video.poster}
-            title={watchContent.title}
-          />
+        {video?.type === "youtube" ? (
+          <VideoFacade videoId={video.videoId} title={title} />
+        ) : video?.type === "direct" ? (
+          <VideoFacadeDirect src={video.src} poster={video.poster} title={title} />
         ) : (
           /*
            * The held plane: the film's own title card before the film
@@ -72,10 +91,10 @@ export function WatchBlock() {
             />
             <div className="px-6 pb-8 pt-20 sm:p-10 lg:p-14">
               <p className="max-w-xl border-t-2 border-brand-gold pt-5 font-display text-3xl font-semibold leading-none tracking-tight text-ink-inverse sm:text-4xl lg:text-5xl">
-                {watchContent.coming.line}
+                {coming.line}
               </p>
               <p className="mt-4 max-w-xl font-body text-base leading-relaxed text-ink-inverse/75">
-                {watchContent.coming.detail}
+                {coming.detail}
               </p>
             </div>
           </div>

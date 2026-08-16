@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent }
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { siteContent } from "@/content/site";
+import type { SocialLink } from "@/content/site";
 import { SocialLinks } from "./SocialLinks";
 
 const LINKS = [
@@ -64,8 +64,17 @@ function isActive(pathname: string, href: string) {
  * the shared diagonal cut into a deep green coda carrying the party line.
  * The plane wipes in along that same diagonal, motion-safe only, and body
  * scroll stays locked while it is up.
+ *
+ * Nav is a client component, so it cannot await CMS-backed content itself;
+ * app/(site)/layout.tsx fetches it and passes it down as props.
  */
-export function Nav() {
+type NavProps = {
+  logo: { src: string; alt: string };
+  partyLogo: { src: string; alt: string };
+  socials: SocialLink[];
+};
+
+export function Nav({ logo, partyLogo, socials }: NavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const openButtonRef = useRef<HTMLButtonElement>(null);
@@ -178,7 +187,7 @@ export function Nav() {
             href="/"
             className={`flex items-center gap-2.5 font-display text-xl font-semibold text-ink ${FOCUS_RING_LIGHT_PLANE}`}
           >
-            <Image src={siteContent.logo.src} alt={siteContent.logo.alt} width={26} height={26} />
+            <Image src={logo.src} alt={logo.alt} width={26} height={26} />
             OTO
           </Link>
 
@@ -204,6 +213,7 @@ export function Nav() {
                */}
               <SocialLinks
                 plane="light"
+                socials={socials}
                 markClassName="h-4 w-4"
                 className="gap-4 border-l border-ink/15 pl-8"
               />
@@ -219,8 +229,8 @@ export function Nav() {
              * of washing out.
              */}
             <Image
-              src={siteContent.partyLogo.src}
-              alt={siteContent.partyLogo.alt}
+              src={partyLogo.src}
+              alt={partyLogo.alt}
               width={93}
               height={80}
               className="h-8 w-auto shrink-0 border-l border-ink/15 pl-8 drop-shadow-sm"
@@ -235,8 +245,8 @@ export function Nav() {
              * control.
              */}
             <Image
-              src={siteContent.partyLogo.src}
-              alt={siteContent.partyLogo.alt}
+              src={partyLogo.src}
+              alt={partyLogo.alt}
               width={93}
               height={80}
               className="h-7 w-auto shrink-0 drop-shadow-sm"
@@ -320,7 +330,7 @@ export function Nav() {
              * would silently move them somewhere they did not choose to go.
              */}
             <div className="bg-brand-green-deep px-6 pt-1 pb-8 sm:px-8">
-              <SocialLinks plane="dark" markClassName="h-6 w-6" className="gap-7 py-2" />
+              <SocialLinks plane="dark" socials={socials} markClassName="h-6 w-6" className="gap-7 py-2" />
               <p className="mt-4 font-body text-sm text-ink-inverse/70">
                 <span className="text-brand-gold">Zenith Labour Party.</span> Oyo South
                 Senatorial District.

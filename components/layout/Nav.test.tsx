@@ -1,11 +1,29 @@
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import { Nav } from "./Nav";
-import { siteContent, socials } from "@/content/site";
+import { siteContentDefault } from "@/content/site";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
+
+const { logo, partyLogo, socials } = siteContentDefault;
+
+/*
+ * Nav is a "use client" component: it cannot await CMS-backed content
+ * itself, so its server ancestor (app/(site)/layout.tsx) fetches the
+ * identity assets and passes them down. Every render below hands Nav the
+ * same default values that ancestor would resolve in production.
+ */
+function renderNav(children?: ReactNode) {
+  return render(
+    <>
+      <Nav logo={logo} partyLogo={partyLogo} socials={socials} />
+      {children}
+    </>
+  );
+}
 
 /*
  * jsdom has no matchMedia at all, and Nav now calls it unconditionally to
@@ -50,7 +68,7 @@ function stubMatchMedia() {
 
 describe("Nav", () => {
   test("links the one-page sections by anchor and the gallery by route", () => {
-    render(<Nav />);
+    renderNav();
     expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/#about");
     expect(screen.getByRole("link", { name: "Agenda" })).toHaveAttribute("href", "/#agenda");
     expect(screen.getByRole("link", { name: "Get Involved" })).toHaveAttribute(
@@ -61,7 +79,7 @@ describe("Nav", () => {
   });
 
   test("mobile menu opens as its own layer, locks scroll, and closes", () => {
-    render(<Nav />);
+    renderNav();
 
     const openButton = screen.getByRole("button", { name: "Open menu" });
     expect(openButton).toHaveAttribute("aria-expanded", "false");
@@ -80,7 +98,7 @@ describe("Nav", () => {
   });
 
   test("escape closes the open menu", () => {
-    render(<Nav />);
+    renderNav();
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
     fireEvent.keyDown(window, { key: "Escape" });
@@ -89,12 +107,12 @@ describe("Nav", () => {
   });
 
   test("renders the wordmark linking home", () => {
-    render(<Nav />);
+    renderNav();
     expect(screen.getByRole("link", { name: "OTO" })).toHaveAttribute("href", "/");
   });
 
   test("pairs the logo mark with the wordmark without renaming the link", () => {
-    const { container } = render(<Nav />);
+    const { container } = renderNav();
     const mark = container.querySelector('img[src*="oto-logo"]');
     expect(mark).not.toBeNull();
     expect(mark).toHaveAttribute("alt", "");
@@ -102,8 +120,8 @@ describe("Nav", () => {
   });
 
   test("carries the party badge in both the desktop cluster and the mobile bar", () => {
-    const { container } = render(<Nav />);
-    const badges = screen.getAllByAltText(siteContent.partyLogo.alt);
+    const { container } = renderNav();
+    const badges = screen.getAllByAltText(partyLogo.alt);
     // One lives in the hidden-until-lg desktop cluster, the other in the
     // lg:hidden mobile bar beside the menu trigger; both stay mounted at
     // once and CSS decides which one is visible at a given breakpoint.
@@ -115,7 +133,7 @@ describe("Nav", () => {
   });
 
   test("aria-controls only points at the overlay while it exists", () => {
-    render(<Nav />);
+    renderNav();
     const openButton = screen.getByRole("button", { name: "Open menu" });
     expect(openButton).not.toHaveAttribute("aria-controls");
 
@@ -128,7 +146,7 @@ describe("Nav", () => {
 
   test("closes and unlocks scroll when the viewport crosses into desktop", () => {
     const { crossToDesktop } = stubMatchMedia();
-    render(<Nav />);
+    renderNav();
 
     const openButton = screen.getByRole("button", { name: "Open menu" });
     fireEvent.click(openButton);
@@ -144,7 +162,7 @@ describe("Nav", () => {
   });
 
   test("the open overlay carries dialog semantics, absent while closed", () => {
-    render(<Nav />);
+    renderNav();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
@@ -156,9 +174,8 @@ describe("Nav", () => {
   });
 
   test("inerts the background landmarks while the menu is open and restores them on close", () => {
-    render(
+    renderNav(
       <>
-        <Nav />
         <main>Page content</main>
         <footer>Footer content</footer>
       </>
@@ -179,12 +196,7 @@ describe("Nav", () => {
 
   test("restores the inerted background when the viewport crosses into desktop", () => {
     const { crossToDesktop } = stubMatchMedia();
-    render(
-      <>
-        <Nav />
-        <main>Page content</main>
-      </>
-    );
+    renderNav(<main>Page content</main>);
     const main = screen.getByText("Page content");
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
@@ -195,7 +207,7 @@ describe("Nav", () => {
   });
 
   test("tab from the last focusable link wraps to the first, shift+tab from the first wraps to the last", () => {
-    render(<Nav />);
+    renderNav();
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 
     const dialog = screen.getByRole("dialog", { name: "Site menu" });
@@ -216,7 +228,7 @@ describe("Nav", () => {
   });
 
   test("desktop header carries the four social channels after the section links", () => {
-    render(<Nav />);
+    renderNav();
     expect(socials.map((social) => social.label)).toEqual([
       "Facebook",
       "Twitter",
@@ -234,7 +246,7 @@ describe("Nav", () => {
   });
 
   test("the overlay coda repeats the social channels with the dark-plane gold ring", () => {
-    render(<Nav />);
+    renderNav();
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     const dialog = screen.getByRole("dialog", { name: "Site menu" });
     for (const social of socials) {
@@ -248,7 +260,7 @@ describe("Nav", () => {
     // Deliberate divergence from the destination links: socials open a new
     // tab, so the page underneath never changes and closing the menu would
     // dump the returning visitor somewhere they did not choose to go.
-    render(<Nav />);
+    renderNav();
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     const dialog = screen.getByRole("dialog", { name: "Site menu" });
 
@@ -264,7 +276,7 @@ describe("Nav", () => {
   });
 
   test("light-plane header controls carry a dark, high-contrast focus-visible outline", () => {
-    render(<Nav />);
+    renderNav();
     // Header bar sits on bg-surface (#f7f8f9). brand-gold only reaches 1.69:1
     // there, failing WCAG 1.4.11's 3:1 floor; brand-green reaches 7.05:1.
     expect(screen.getByRole("link", { name: "OTO" }).className).toContain(
@@ -282,7 +294,7 @@ describe("Nav", () => {
   });
 
   test("dark-plane overlay controls keep the gold focus-visible outline", () => {
-    render(<Nav />);
+    renderNav();
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     const dialog = screen.getByRole("dialog", { name: "Site menu" });
 

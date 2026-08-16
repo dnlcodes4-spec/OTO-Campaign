@@ -1,5 +1,5 @@
 import { Heading } from "@/components/primitives/Heading";
-import { agendaContent } from "@/content/agenda";
+import type { Pledge } from "@/content/agenda";
 
 /*
  * The constituency pledges follow the legislative agenda as its close-to-home
@@ -8,7 +8,22 @@ import { agendaContent } from "@/content/agenda";
  * money), and the pledges run as a two-column ledger under heavy ink rules
  * straight into the cut that hands over to the closing green plane.
  */
-export function PledgeGrid() {
+type PledgeGridProps = {
+  /*
+   * PledgeGrid is nested inside HomePage's returned tree (see AgendaLedger
+   * for the full rationale), so it stays a plain component and takes its
+   * content as props from the page, which awaits `getAgendaContent()` once
+   * for the route. `pledges`/`pledgesIntro`/`pledgesPull` are not part of
+   * `agendaSchema` (only `intro`/`items` are editable per the CMS schema),
+   * but they still live on `agendaContentDefault`/the merged DB row, so
+   * they're read from the same fetched content object as the agenda items.
+   */
+  pledgesPull: string;
+  pledgesIntro: string;
+  pledges: Pledge[];
+};
+
+export function PledgeGrid({ pledgesPull, pledgesIntro, pledges }: PledgeGridProps) {
   return (
     <div>
       <Heading
@@ -20,15 +35,15 @@ export function PledgeGrid() {
       </Heading>
       <div className="mt-8 grid gap-x-12 gap-y-6 lg:mt-12 lg:grid-cols-12 lg:items-baseline">
         <p className="font-display text-2xl font-semibold leading-tight tracking-tight text-brand-green sm:text-3xl lg:col-span-6">
-          {agendaContent.pledgesPull}
+          {pledgesPull}
         </p>
         <p className="max-w-xl font-body text-base leading-relaxed text-ink/70 lg:col-span-6">
-          {agendaContent.pledgesIntro}
+          {pledgesIntro}
         </p>
       </div>
       <div className="mt-12 grid gap-x-10 sm:grid-cols-2 lg:mt-16">
-        {agendaContent.pledges.map((pledge) => (
-          <div key={pledge.title} className="border-t-2 border-ink py-6 sm:py-8">
+        {pledges.map((pledge, index) => (
+          <div key={pledge.title ?? index} className="border-t-2 border-ink py-6 sm:py-8">
             <Heading level={3} sizeOverride="text-xl sm:text-2xl leading-tight">
               {pledge.title}
             </Heading>

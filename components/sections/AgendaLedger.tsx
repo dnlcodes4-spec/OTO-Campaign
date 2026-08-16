@@ -8,7 +8,7 @@ import {
   WarrantyLaws,
   type PictogramProps,
 } from "@/components/graphics";
-import { agendaContent, type AgendaItem } from "@/content/agenda";
+import type { AgendaItem } from "@/content/agenda";
 
 /*
  * The legislative agenda is the meat of the page, so it gets the darkest
@@ -35,7 +35,7 @@ const PICTOGRAMS: Record<string, (props: PictogramProps) => React.ReactNode> = {
 };
 
 function AgendaItemRow({ item }: { item: AgendaItem }) {
-  const Pictogram = PICTOGRAMS[item.number];
+  const Pictogram = item.number ? PICTOGRAMS[item.number] : undefined;
   return (
     <article className="border-t border-ink-inverse/20 py-10 sm:py-12 lg:py-16">
       <div className="grid gap-x-10 gap-y-4 lg:grid-cols-12">
@@ -56,11 +56,21 @@ function AgendaItemRow({ item }: { item: AgendaItem }) {
           </p>
           {item.routes && (
             <div className="mt-8 grid gap-8 sm:grid-cols-2 sm:gap-10">
-              {item.routes.map((route) => (
-                <div key={route.title} className="border-t-2 border-brand-gold pt-4">
+              {item.routes.map((route, routeIndex) => (
+                <div key={route.title ?? routeIndex} className="border-t-2 border-brand-gold pt-4">
                   <Heading level={4}>{route.title}</Heading>
                   <ul className="mt-3 divide-y divide-ink-inverse/10">
-                    {route.points.map((point) => (
+                    {/*
+                     * The generic CMS "Add" button on the routes list
+                     * appends a bare `{}` route (Task 3's design for any
+                     * list-of-group field), which has no `points` key at
+                     * all until an admin also adds a point beneath it.
+                     * `route.points` is not itself an `optional` field
+                     * (Task 4), so it can genuinely be undefined here —
+                     * guard with `?? []` rather than assume the schema
+                     * shape holds for admin-authored data.
+                     */}
+                    {(route.points ?? []).map((point) => (
                       <li
                         key={point}
                         className="py-2.5 font-body text-sm leading-relaxed text-ink-inverse/70"
@@ -96,7 +106,21 @@ function AgendaItemRow({ item }: { item: AgendaItem }) {
   );
 }
 
-export function AgendaLedger() {
+type AgendaLedgerProps = {
+  /*
+   * AgendaLedger is nested inside HomePage's returned tree, and HomePage's
+   * own test renders `await HomePage()` at the top level, so a
+   * Promise-returning component nested inside that already-constructed
+   * tree can't be resolved by React Testing Library. It stays a plain
+   * (non-async) component and takes its content as props from the page,
+   * which awaits `getAgendaContent()` once for the route — the same
+   * pattern used for SenatorJob/PedigreeBlock/etc.
+   */
+  intro: string;
+  items: AgendaItem[];
+};
+
+export function AgendaLedger({ intro, items }: AgendaLedgerProps) {
   return (
     <div>
       <Heading
@@ -107,11 +131,11 @@ export function AgendaLedger() {
         When you get there, what do you have in mind <span className="text-brand-gold">for us?</span>
       </Heading>
       <p className="mt-8 max-w-2xl font-body text-base leading-relaxed text-ink-inverse/75 sm:text-lg lg:mt-12">
-        {agendaContent.intro}
+        {intro}
       </p>
       <div className="mt-12 lg:mt-16">
-        {agendaContent.items.map((item) => (
-          <AgendaItemRow key={item.number} item={item} />
+        {items.map((item, index) => (
+          <AgendaItemRow key={item.number ?? index} item={item} />
         ))}
       </div>
     </div>

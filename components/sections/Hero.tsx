@@ -1,12 +1,21 @@
 import Image from "next/image";
 import { Heading } from "@/components/primitives/Heading";
 import { CampaignImage } from "@/components/primitives/CampaignImage";
-import { siteContent } from "@/content/site";
 
 type HeroProps = {
   headline: string;
   intro: string;
   portrait: {
+    src: string;
+    alt: string;
+  };
+  /*
+   * Hero is nested inside HomePage's returned tree rather than being the
+   * component under direct test/render, so it stays a plain (non-async)
+   * component and takes the party badge as a prop from the page, which
+   * already awaits `getSiteContentData()` once for the whole route.
+   */
+  partyLogo: {
     src: string;
     alt: string;
   };
@@ -41,7 +50,7 @@ type HeroProps = {
  * own rounded edge and no added frame, and it is preloaded because the
  * whole point of the placement is that it is inside the first viewport.
  */
-export function Hero({ headline, intro, portrait }: HeroProps) {
+export function Hero({ headline, intro, portrait, partyLogo }: HeroProps) {
   const words = headline.split(" ");
   const lead = words.slice(0, -2).join(" ");
   const emphasis = words.slice(-2).join(" ");
@@ -65,8 +74,8 @@ export function Hero({ headline, intro, portrait }: HeroProps) {
           {intro}
         </p>
         <Image
-          src={siteContent.partyLogo.src}
-          alt={siteContent.partyLogo.alt}
+          src={partyLogo.src}
+          alt={partyLogo.alt}
           width={93}
           height={80}
           preload

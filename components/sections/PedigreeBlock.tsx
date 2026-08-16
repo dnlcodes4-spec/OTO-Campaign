@@ -1,6 +1,6 @@
 import { Heading } from "@/components/primitives/Heading";
 import { CampaignImage } from "@/components/primitives/CampaignImage";
-import { aboutContent } from "@/content/about";
+import type { EducationEntry } from "@/content/about";
 
 /*
  * The about section keeps the campaign's own structure: the questions a
@@ -18,9 +18,40 @@ import { aboutContent } from "@/content/about";
  * bottom-anchors so its base lines up with the red quote plane across the
  * gutter: green and red closing on the same baseline.
  */
-export function PedigreeBlock() {
-  const { nameParts, portrait } = aboutContent;
+type PedigreeBlockProps = {
+  /*
+   * PedigreeBlock is nested inside HomePage's returned tree rather than
+   * being the component under direct test/render (HomePage's own test
+   * renders `await HomePage()` at the top level, and a Promise-returning
+   * component nested inside that already-constructed tree can't be
+   * resolved by React Testing Library), so it stays a plain (non-async)
+   * component and takes its content as props from the page, which awaits
+   * `getAboutContent()` once for the route.
+   */
+  nameParts: string[];
+  nameNote: string;
+  portrait: { src: string; alt: string };
+  abujaAnswer: string;
+  abujaSupport: string;
+  abujaRecord: string[];
+  character: string;
+  quote: string;
+  education: EducationEntry[];
+  tieUps: { lead: string; pairs: { uk: string; ng: string }[] };
+};
 
+export function PedigreeBlock({
+  nameParts,
+  nameNote,
+  portrait,
+  abujaAnswer,
+  abujaSupport,
+  abujaRecord,
+  character,
+  quote,
+  education,
+  tieUps,
+}: PedigreeBlockProps) {
   return (
     <div>
       <Heading
@@ -32,10 +63,10 @@ export function PedigreeBlock() {
       </Heading>
       <div className="mt-8 grid gap-x-12 gap-y-6 lg:mt-12 lg:grid-cols-12 lg:items-baseline">
         <p className="font-display text-3xl font-semibold leading-[1.05] tracking-tight text-brand-red sm:text-4xl lg:col-span-5">
-          {aboutContent.abujaAnswer}
+          {abujaAnswer}
         </p>
         <p className="max-w-xl font-body text-base leading-relaxed text-ink/70 lg:col-span-7">
-          {aboutContent.abujaSupport}
+          {abujaSupport}
         </p>
       </div>
       {/*
@@ -44,7 +75,7 @@ export function PedigreeBlock() {
        * answer, the same micro-row treatment the agenda items use.
        */}
       <ul className="mt-10 max-w-4xl divide-y divide-ink/10 border-t border-ink/10 sm:columns-2 sm:gap-10 sm:[column-fill:balance]">
-        {aboutContent.abujaRecord.map((line) => (
+        {abujaRecord.map((line) => (
           <li
             key={line}
             className="break-inside-avoid py-3 font-body text-sm leading-relaxed text-ink/70"
@@ -75,14 +106,14 @@ export function PedigreeBlock() {
               ))}
             </p>
             <p className="mt-4 max-w-md font-body text-sm leading-relaxed text-ink/60">
-              {aboutContent.nameNote}
+              {nameNote}
             </p>
             <p className="mt-8 max-w-xl font-body text-base leading-relaxed text-ink/70 sm:text-lg">
-              {aboutContent.character}
+              {character}
             </p>
             <blockquote className="mt-10 bg-brand-red p-8 [clip-path:polygon(0_0,100%_0,100%_92%,94%_100%,0_100%)] sm:p-10 lg:mt-12">
               <p className="font-display text-2xl font-semibold leading-tight text-ink-inverse sm:text-3xl">
-                {aboutContent.quote}
+                {quote}
               </p>
             </blockquote>
           </div>
@@ -104,7 +135,7 @@ export function PedigreeBlock() {
         </div>
 
         <div className="mt-14 lg:mt-20">
-          {aboutContent.education.map((entry) => (
+          {education.map((entry) => (
             <div
               key={entry.school}
               className="grid gap-y-1 border-t-2 border-ink py-6 sm:py-8 lg:grid-cols-12 lg:items-baseline lg:gap-x-10"
@@ -129,10 +160,10 @@ export function PedigreeBlock() {
          */}
         <div className="mt-10 border-t-2 border-ink pt-6 sm:pt-8">
           <p className="max-w-xl font-body text-base leading-relaxed text-ink/70">
-            {aboutContent.tieUps.lead}
+            {tieUps.lead}
           </p>
           <div className="mt-6 grid gap-x-10 gap-y-4 sm:grid-cols-3">
-            {aboutContent.tieUps.pairs.map((pair) => (
+            {tieUps.pairs.map((pair) => (
               <div key={pair.uk} className="border-t border-ink/15 pt-3">
                 <p className="font-display text-lg font-semibold leading-tight">{pair.uk}</p>
                 <p className="mt-1 font-body text-sm leading-relaxed text-ink/60">

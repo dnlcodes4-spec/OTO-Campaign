@@ -36,3 +36,8 @@ test("renders the sign-out control", () => {
   render(<AdminNav />);
   expect(screen.getByText("Sign out")).toBeInTheDocument();
 });
+
+test("includes a link to the content editor", () => {
+  render(<AdminNav />);
+  expect(screen.getByRole("link", { name: "Content" })).toHaveAttribute("href", "/admin/content");
+});

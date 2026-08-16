@@ -1,10 +1,12 @@
+import { getSiteContent } from "@/lib/content/site-content";
+
 export type EducationEntry = {
   period: string;
   school: string;
   credential: string;
 };
 
-export const aboutContent = {
+export const aboutContentDefault = {
   nameParts: ["Oluwasegun", "Theophilus", "Oladimeji"],
   nameNote: "Three names. Their first letters are what Oyo South calls him: OTO.",
   portrait: {
@@ -47,3 +49,7 @@ export const aboutContent = {
     ],
   } as { lead: string; pairs: { uk: string; ng: string }[] },
 };
+
+export async function getAboutContent() {
+  return getSiteContent("about", aboutContentDefault);
+}
