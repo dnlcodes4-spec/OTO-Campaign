@@ -110,7 +110,7 @@ export function Hero({ headline, intro, portrait, partyLogo }: HeroProps) {
           alt={partyLogo.alt}
           width={186}
           height={160}
-          className="absolute top-5 -left-6 z-20 h-auto w-20 sm:top-6 sm:right-5 sm:w-28 lg:top-8 lg:right-6 lg:w-40"
+          className="absolute top-5 right-0.5 z-20 h-auto w-20 sm:top-6 sm:right-3 sm:w-28 lg:top-8 lg:right-6 lg:w-40"
         />
       </div>
     </div>
