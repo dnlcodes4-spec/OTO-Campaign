@@ -18,21 +18,21 @@ describe("VideoFacade", () => {
       `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`
     );
     expect(container.querySelector("iframe")).toBeNull();
-    expect(screen.getByRole("button", { name: `Play the film: ${title}` })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: `Watch: ${title}` })).toBeInTheDocument();
   });
 
   test("the play control's accessible name starts with its visible label", () => {
     // WCAG 2.5.3 Label in Name: a voice-control user saying the visible
-    // words "Play the film" must match the control's accessible name.
+    // word "Watch" must match the control's accessible name.
     render(<VideoFacade videoId={videoId} title={title} />);
-    const play = screen.getByRole("button", { name: /Play the film/ });
-    expect(play.getAttribute("aria-label")).toMatch(/^Play the film/);
-    expect(play.textContent).toContain("Play the film");
+    const play = screen.getByRole("button", { name: /Watch/ });
+    expect(play.getAttribute("aria-label")).toMatch(/^Watch/);
+    expect(play.textContent).toContain("Watch");
   });
 
   test("play swaps the facade for the privacy-enhanced embed", () => {
     const { container } = render(<VideoFacade videoId={videoId} title={title} />);
-    fireEvent.click(screen.getByRole("button", { name: `Play the film: ${title}` }));
+    fireEvent.click(screen.getByRole("button", { name: `Watch: ${title}` }));
 
     const iframe = container.querySelector("iframe");
     expect(iframe).not.toBeNull();
@@ -65,7 +65,7 @@ describe("VideoFacade", () => {
     fireEvent.error(screen.getByAltText(title));
 
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
-    const play = screen.getByRole("button", { name: `Play the film: ${title}` });
+    const play = screen.getByRole("button", { name: `Watch: ${title}` });
     fireEvent.click(play);
     expect(container.querySelector("iframe")).not.toBeNull();
   });

@@ -31,6 +31,6 @@ export type SocialMarkProps = {
 };
 
 export { FacebookMark } from "./FacebookMark";
-export { TwitterMark } from "./TwitterMark";
 export { InstagramMark } from "./InstagramMark";
 export { YouTubeMark } from "./YouTubeMark";
+export { TikTokMark } from "./TikTokMark";

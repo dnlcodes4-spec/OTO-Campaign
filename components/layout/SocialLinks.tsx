@@ -3,8 +3,8 @@ import type { SocialLink, SocialPlatform } from "@/content/site";
 import {
   FacebookMark,
   InstagramMark,
-  TwitterMark,
   YouTubeMark,
+  TikTokMark,
   type SocialMarkProps,
 } from "@/components/graphics";
 
@@ -12,9 +12,9 @@ type SocialLinksPlane = "light" | "dark";
 
 const MARKS: Record<SocialPlatform, ComponentType<SocialMarkProps>> = {
   facebook: FacebookMark,
-  twitter: TwitterMark,
   instagram: InstagramMark,
   youtube: YouTubeMark,
+  tiktok: TikTokMark,
 };
 
 /*
@@ -50,9 +50,8 @@ type SocialLinksProps = {
 
 /*
  * One row, three placements (header, overlay coda, footer), all reading the
- * same placeholder-driven array sourced from content/site.ts. Every link
- * opens the platform in a new tab and is named "OTO on <platform>"; the
- * glyphs stay decorative.
+ * same array sourced from content/site.ts. Every link opens the platform in
+ * a new tab and is named "OTO on <platform>"; the glyphs stay decorative.
  */
 export function SocialLinks({
   plane,

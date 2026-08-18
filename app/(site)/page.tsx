@@ -18,6 +18,7 @@ import { getGetInvolvedContent } from "@/content/get-involved";
 import { getAtunlutoContent } from "@/content/atunluto";
 import { getStoryContent } from "@/content/story";
 import { getAgendaContent } from "@/content/agenda";
+import { getChannelVideos } from "@/lib/youtube";
 
 /*
  * No page-level metadata here: this route's title and description are
@@ -63,6 +64,7 @@ export default async function HomePage() {
     atunlutoContent,
     storyContent,
     agendaContent,
+    watchVideos,
   ] = await Promise.all([
     getHomeContent(),
     getSiteContentData(),
@@ -73,6 +75,7 @@ export default async function HomePage() {
     getAtunlutoContent(),
     getStoryContent(),
     getAgendaContent(),
+    getChannelVideos(watchContentDefault.channelId, 6),
   ]);
   return (
     <>
@@ -139,23 +142,23 @@ export default async function HomePage() {
       <Section id="watch" tone="ink">
         <WatchBlock
           /*
-           * video is deliberately sourced from watchContentDefault, not
-           * from watchContent (getWatchContent()'s CMS-merged result).
-           * video is excluded from watchSchema, so SchemaForm never renders
-           * a control for it, but SchemaForm's save path spreads the whole
-           * loaded record forward on every edit, so a Watch content save
-           * from /admin/content/watch could still persist a stray `video`
-           * key into the oto_site_content row. Reading it from the
-           * hardcoded default here keeps that scenario harmless: whatever
-           * lands in the DB row is never read back out for rendering, and
-           * "swap the value in content/watch.ts" stays the entire release
-           * for this field regardless of what SchemaForm ever saves.
+           * channelId and filler are deliberately sourced from
+           * watchContentDefault, not from watchContent (getWatchContent()'s
+           * CMS-merged result). Both are excluded from watchSchema, so
+           * SchemaForm never renders a control for either, but SchemaForm's
+           * save path spreads the whole loaded record forward on every
+           * edit, so a Watch content save from /admin/content/watch could
+           * still persist a stray channelId/filler key into the
+           * oto_site_content row. Reading them from the hardcoded default
+           * here keeps that scenario harmless: whatever lands in the DB row
+           * is never read back out for rendering. watchVideos is the
+           * result of fetching that same channelId above, fed straight
+           * through here rather than re-fetched.
            */
-          video={watchContentDefault.video}
-          title={watchContent.title}
+          videos={watchVideos}
+          filler={watchContentDefault.filler}
           answer={watchContent.answer}
           body={watchContent.body}
-          coming={watchContent.coming}
         />
       </Section>
       <PlaneCut from="ink" to="green" />

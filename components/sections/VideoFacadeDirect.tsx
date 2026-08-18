@@ -8,7 +8,8 @@ import { useState } from "react";
  * the poster comes straight from the caller (a Cloudinary-derived frame, no
  * i.ytimg.com step-down chain needed) and the swap loads the mp4 inline
  * instead of an iframe embed, since there is no third-party player to load
- * lazily.
+ * lazily. Used today as the grid's filler tile (see VideoGrid): a real clip
+ * padding out the spaces the channel doesn't have YouTube uploads for yet.
  */
 
 type VideoFacadeDirectProps = {
@@ -40,7 +41,7 @@ export function VideoFacadeDirect({ src, poster, title }: VideoFacadeDirectProps
     <button
       type="button"
       onClick={() => setPlaying(true)}
-      aria-label={`Play the film: ${title}`}
+      aria-label={`Watch: ${title}`}
       className="group relative block aspect-video w-full overflow-hidden text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
     >
       {posterFailed ? (
@@ -58,9 +59,7 @@ export function VideoFacadeDirect({ src, poster, title }: VideoFacadeDirectProps
         <svg viewBox="0 0 14 16" aria-hidden="true" className="h-4 w-3.5 fill-ink">
           <polygon points="0,0 14,8 0,16" />
         </svg>
-        <span className="font-display text-base font-semibold text-ink sm:text-lg">
-          Play the film
-        </span>
+        <span className="font-display text-base font-semibold text-ink sm:text-lg">Watch</span>
       </span>
     </button>
   );

@@ -1,7 +1,6 @@
 import { Heading } from "@/components/primitives/Heading";
-import { VideoFacade } from "./VideoFacade";
-import { VideoFacadeDirect } from "./VideoFacadeDirect";
-import type { VideoSource } from "@/content/watch";
+import { VideoGrid, type FillerVideo } from "./VideoGrid";
+import type { ChannelVideo } from "@/lib/youtube";
 
 /*
  * The film plane sits between the pledges and the ask on purpose: by this
@@ -13,24 +12,15 @@ import type { VideoSource } from "@/content/watch";
  * is also its cinema: poster type and gold accents read strongest there,
  * and a 16:9 frame belongs on a dark plane.
  *
- * Three states, all designed, keyed off content/watch.ts's video field:
- *
- * 1. video null: the held plane below, a brand-green 16:9 field rising
- *    through the section's deep green on the page's diagonal, carrying the
- *    promise in poster type over a gold rule. Nothing pretends to be
- *    clickable; the plane is the composition, not an empty player.
- * 2. video.type "youtube": VideoFacade renders the thumbnail facade with a
- *    real play control, and no YouTube JavaScript loads until it is
- *    pressed.
- * 3. video.type "direct": VideoFacadeDirect renders the same facade
- *    grammar against a self-hosted (Cloudinary) clip; play swaps it for an
- *    inline, autoplaying <video> rather than an iframe embed.
- *
- * Swapping the video value in content/watch.ts is the entire release for
- * that field; this component does not change. video is intentionally not
- * part of the CMS-editable content (see content/schemas/watch.ts), so it
- * still comes in as a plain prop sourced from watchContentDefault, not from
- * getWatchContent()'s merged result.
+ * The grid reads straight from the campaign's YouTube channel (see
+ * lib/youtube.ts), up to 6 of its most recent uploads, newest first: no
+ * content-file edit is the release any more, uploading to the channel is.
+ * Real uploads always fill the first slots; content/watch.ts's filler clip
+ * pads out whatever's left, always in the last slot, so it keeps getting
+ * pushed further down as more real uploads land until 6 of them fill the
+ * grid on their own (see VideoGrid). Every tile, real or filler, is the
+ * same click-to-play facade grammar the section has always used: no
+ * YouTube JavaScript loads until a specific tile is pressed.
  */
 type WatchBlockProps = {
   /*
@@ -39,20 +29,22 @@ type WatchBlockProps = {
    * `await HomePage()` at the top level, and a Promise-returning component
    * nested inside that already-constructed tree can't be resolved by
    * React Testing Library), so it stays a plain (non-async) component and
-   * takes its content as props from the page, which awaits
-   * `getWatchContent()` once for the route.
+   * takes its content as props from the page, which awaits both
+   * `getWatchContent()` and `getChannelVideos()` once for the route.
+   *
+   * channelId and filler are excluded from content/schemas/watch.ts (the
+   * same way video used to be), so they come in from watchContentDefault
+   * rather than getWatchContent()'s CMS-merged result: filler is what
+   * getChannelVideos() padded videos with, so it is passed straight
+   * through here rather than re-derived.
    */
-  video: VideoSource | null;
-  title: string;
+  videos: ChannelVideo[];
+  filler: FillerVideo;
   answer: string;
   body: string;
-  coming: {
-    line: string;
-    detail: string;
-  };
 };
 
-export function WatchBlock({ video, title, answer, body, coming }: WatchBlockProps) {
+export function WatchBlock({ videos, filler, answer, body }: WatchBlockProps) {
   return (
     <div>
       <Heading
@@ -73,32 +65,7 @@ export function WatchBlock({ video, title, answer, body, coming }: WatchBlockPro
       </div>
 
       <div className="mt-10 lg:mt-14">
-        {video?.type === "youtube" ? (
-          <VideoFacade videoId={video.videoId} title={title} />
-        ) : video?.type === "direct" ? (
-          <VideoFacadeDirect src={video.src} poster={video.poster} title={title} />
-        ) : (
-          /*
-           * The held plane: the film's own title card before the film
-           * exists. Mobile lets the copy set the height; sm and up locks
-           * the 16:9 frame the player will occupy, so the composition does
-           * not shift on release day.
-           */
-          <div className="relative flex w-full flex-col justify-end overflow-hidden bg-brand-green sm:aspect-video">
-            <div
-              aria-hidden="true"
-              className="absolute inset-x-0 top-0 h-8 bg-brand-green-deep [clip-path:polygon(0_0,100%_0,100%_100%)] sm:h-12 lg:h-16"
-            />
-            <div className="px-6 pb-8 pt-20 sm:p-10 lg:p-14">
-              <p className="max-w-xl border-t-2 border-brand-gold pt-5 font-display text-3xl font-semibold leading-none tracking-tight text-ink-inverse sm:text-4xl lg:text-5xl">
-                {coming.line}
-              </p>
-              <p className="mt-4 max-w-xl font-body text-base leading-relaxed text-ink-inverse/75">
-                {coming.detail}
-              </p>
-            </div>
-          </div>
-        )}
+        <VideoGrid videos={videos} filler={filler} />
       </div>
     </div>
   );

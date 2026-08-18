@@ -231,9 +231,9 @@ describe("Nav", () => {
     renderNav();
     expect(socials.map((social) => social.label)).toEqual([
       "Facebook",
-      "Twitter",
       "Instagram",
       "YouTube",
+      "TikTok",
     ]);
     for (const social of socials) {
       const link = screen.getByRole("link", { name: `OTO on ${social.label}` });

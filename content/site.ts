@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { getSiteContent } from "@/lib/content/site-content";
 
-export type SocialPlatform = "facebook" | "twitter" | "instagram" | "youtube";
+export type SocialPlatform = "facebook" | "instagram" | "youtube" | "tiktok";
 
 export type SocialLink = {
   platform: SocialPlatform;
@@ -9,7 +9,7 @@ export type SocialLink = {
   href: string;
 };
 
-const KNOWN_PLATFORMS: readonly SocialPlatform[] = ["facebook", "twitter", "instagram", "youtube"];
+const KNOWN_PLATFORMS: readonly SocialPlatform[] = ["facebook", "instagram", "youtube", "tiktok"];
 
 /*
  * `content/schemas/site.ts` deliberately leaves `platform` out of the
@@ -43,14 +43,15 @@ function isKnownSocialLink(social: unknown): social is SocialLink {
  * with the red, white and green panels, and is always placed as that
  * card on the page's colored planes, never recolored or cropped.
  *
- * PLACEHOLDERS: the campaign's social profiles are not live yet, so every
- * href points at the platform's root. Once this content type has ever been
- * saved through the CMS (which is the normal path in production — every
- * content area ships with a seeded row), the database row wins over this
- * array entirely; editing this file alone will not change what's live.
- * Update the real profile URLs at /admin/content/site instead. This array
- * still matters as the shape SchemaForm renders against, and as the
- * fallback an empty/unseeded database degrades to.
+ * The real profile URLs below (facebook/instagram/youtube/tiktok, no
+ * twitter — the campaign has no account there) are the confirmed live
+ * handles. Once this content type has ever been saved through the CMS
+ * (which is the normal path in production — every content area ships with
+ * a seeded row), the database row wins over this array entirely; editing
+ * this file alone will not change what's live. Update the real profile
+ * URLs at /admin/content/site instead. This array still matters as the
+ * shape SchemaForm renders against, and as the fallback an empty/unseeded
+ * database degrades to.
  */
 export const siteContentDefault = {
   logo: {
@@ -62,10 +63,10 @@ export const siteContentDefault = {
     alt: "Zenith Labour Party logo",
   },
   socials: [
-    { platform: "facebook", label: "Facebook", href: "https://www.facebook.com/" },
-    { platform: "twitter", label: "Twitter", href: "https://x.com/" },
-    { platform: "instagram", label: "Instagram", href: "https://www.instagram.com/" },
-    { platform: "youtube", label: "YouTube", href: "https://www.youtube.com/" },
+    { platform: "facebook", label: "Facebook", href: "https://www.facebook.com/otosenate2027" },
+    { platform: "instagram", label: "Instagram", href: "https://www.instagram.com/otosenate2027/" },
+    { platform: "youtube", label: "YouTube", href: "https://youtube.com/@otosenate2027" },
+    { platform: "tiktok", label: "TikTok", href: "https://www.tiktok.com/@otosenate2027" },
   ] as SocialLink[],
 };
 

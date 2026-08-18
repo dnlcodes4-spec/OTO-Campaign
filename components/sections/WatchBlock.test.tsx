@@ -2,12 +2,17 @@ import { describe, expect, test } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { WatchBlock } from "./WatchBlock";
 
-const baseProps = {
-  video: null,
+const filler = {
+  src: "https://res.cloudinary.com/dgols34tu/video/upload/v1/oto-gallery/clip.mp4",
+  poster: "https://res.cloudinary.com/dgols34tu/video/upload/so_3/oto-gallery/clip.jpg",
   title: "OTO for Senate: the campaign film",
+};
+
+const baseProps = {
+  videos: [],
+  filler,
   answer: "Watch him say it himself.",
   body: "Every answer on this page is a commitment the candidate makes in his own voice.",
-  coming: { line: "The film is coming.", detail: "" },
 };
 
 describe("WatchBlock", () => {
@@ -22,42 +27,39 @@ describe("WatchBlock", () => {
     expect(screen.getByText(baseProps.answer)).toBeInTheDocument();
   });
 
-  test("ships the held plane while video is null: no embed, no thumbnail, no fake control", () => {
-    const { container } = render(<WatchBlock {...baseProps} />);
-    expect(container.querySelector("iframe")).toBeNull();
-    expect(container.querySelector("video")).toBeNull();
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
-    expect(screen.getByText(baseProps.coming.line)).toBeInTheDocument();
+  test("shows only the filler when the channel has no videos yet", () => {
+    render(<WatchBlock {...baseProps} />);
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+    expect(screen.getByRole("button", { name: `Watch: ${filler.title}` })).toBeInTheDocument();
   });
 
-  test("renders the YouTube facade when video.type is youtube", () => {
+  test("renders a facade tile per real video, plus the filler padding out the rest", () => {
     const props = {
       ...baseProps,
-      video: { type: "youtube" as const, videoId: "dQw4w9WgXcQ" },
+      videos: [
+        { videoId: "dQw4w9WgXcQ", title: "Town hall highlights" },
+        { videoId: "abc123XYZ00", title: "Rally in Ibadan" },
+      ],
     };
-    const { container } = render(<WatchBlock {...props} />);
-    expect(screen.getByAltText(props.title)).toHaveAttribute(
+    render(<WatchBlock {...props} />);
+    const buttons = screen.getAllByRole("button");
+    expect(buttons).toHaveLength(3);
+    expect(screen.getByAltText("Town hall highlights")).toHaveAttribute(
       "src",
       "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
     );
-    expect(container.querySelector("video")).toBeNull();
+    expect(buttons[2]).toHaveAttribute("aria-label", `Watch: ${filler.title}`);
   });
 
-  test("renders the direct facade when video.type is direct", () => {
+  test("drops the filler once the channel has 6 videos of its own", () => {
     const props = {
       ...baseProps,
-      video: {
-        type: "direct" as const,
-        src: "https://res.cloudinary.com/dgols34tu/video/upload/v1/oto-gallery/clip.mp4",
-        poster: "https://res.cloudinary.com/dgols34tu/video/upload/so_3/oto-gallery/clip.jpg",
-      },
+      videos: Array.from({ length: 6 }, (_, i) => ({ videoId: `video-${i}`, title: `Video ${i}` })),
     };
-    const { container } = render(<WatchBlock {...props} />);
-    expect(screen.getByAltText(props.title)).toHaveAttribute(
-      "src",
-      "https://res.cloudinary.com/dgols34tu/video/upload/so_3/oto-gallery/clip.jpg"
-    );
-    expect(container.querySelector("iframe")).toBeNull();
+    render(<WatchBlock {...props} />);
+    expect(screen.getAllByRole("button")).toHaveLength(6);
+    expect(
+      screen.queryByRole("button", { name: `Watch: ${filler.title}` })
+    ).not.toBeInTheDocument();
   });
 });

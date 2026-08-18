@@ -54,11 +54,12 @@ export function VideoFacade({ videoId, title }: VideoFacadeProps) {
       onClick={() => setPlaying(true)}
       /*
        * WCAG 2.5.3 Label in Name: the accessible name starts with the
-       * control's visible words ("Play the film") verbatim, so a
-       * voice-control user can speak what they see; the film title rides
-       * behind it for screen reader context.
+       * control's visible word ("Watch") verbatim, so a voice-control user
+       * can speak what they see; the clip's own title rides behind it for
+       * screen reader context, since this facade now repeats once per tile
+       * in a grid of different clips rather than fronting a single film.
        */
-      aria-label={`Play the film: ${title}`}
+      aria-label={`Watch: ${title}`}
       className="group relative block aspect-video w-full overflow-hidden text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
     >
       {thumb === "plane" ? (
@@ -87,9 +88,7 @@ export function VideoFacade({ videoId, title }: VideoFacadeProps) {
         <svg viewBox="0 0 14 16" aria-hidden="true" className="h-4 w-3.5 fill-ink">
           <polygon points="0,0 14,8 0,16" />
         </svg>
-        <span className="font-display text-base font-semibold text-ink sm:text-lg">
-          Play the film
-        </span>
+        <span className="font-display text-base font-semibold text-ink sm:text-lg">Watch</span>
       </span>
     </button>
   );
