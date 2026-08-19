@@ -16,7 +16,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: pushMock, refresh: refreshMock }),
 }));
 
-import AdminLoginPage from "./page";
+import { AdminLoginForm } from "./AdminLoginForm";
 
 let fetchMock: ReturnType<typeof vi.fn>;
 
@@ -35,7 +35,7 @@ beforeEach(() => {
 
 test("signs in and redirects to /admin on success", async () => {
   signInWithPasswordMock.mockResolvedValue({ error: null });
-  render(<AdminLoginPage />);
+  render(<AdminLoginForm />);
 
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@b.com" } });
   fireEvent.change(screen.getByLabelText("Password"), { target: { value: "secret" } });
@@ -51,7 +51,7 @@ test("signs a non-admin back out and explains why, instead of redirecting", asyn
   signInWithPasswordMock.mockResolvedValue({ error: null });
   fetchMock.mockResolvedValue({ ok: false, status: 401 });
   signOutMock.mockResolvedValue({ error: null });
-  render(<AdminLoginPage />);
+  render(<AdminLoginForm />);
 
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "atunluto@b.com" } });
   fireEvent.change(screen.getByLabelText("Password"), { target: { value: "secret" } });
@@ -66,7 +66,7 @@ test("signs a non-admin back out and explains why, instead of redirecting", asyn
 
 test("shows an error message on failed sign-in", async () => {
   signInWithPasswordMock.mockResolvedValue({ error: new Error("Invalid credentials") });
-  render(<AdminLoginPage />);
+  render(<AdminLoginForm />);
 
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@b.com" } });
   fireEvent.change(screen.getByLabelText("Password"), { target: { value: "wrong" } });
@@ -85,7 +85,7 @@ test("recovers the button and shows an error if the Supabase client itself throw
   createClientMock.mockImplementation(() => {
     throw new Error("supabaseUrl is required.");
   });
-  render(<AdminLoginPage />);
+  render(<AdminLoginForm />);
 
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@b.com" } });
   fireEvent.change(screen.getByLabelText("Password"), { target: { value: "secret" } });

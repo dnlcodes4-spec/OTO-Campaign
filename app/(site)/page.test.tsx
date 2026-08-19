@@ -166,8 +166,8 @@ describe("Home page", () => {
 
   test("composes the three candidate portraits with their content-file alt text", async () => {
     render(await HomePage());
-    // 3 candidate portraits + 3 party badges (two in the hero, one on vote-targets) + 1 watch-grid facade poster (the filler, since no real videos are mocked).
-    expect(screen.getAllByRole("img")).toHaveLength(7);
+    // 3 candidate portraits + 2 party badges (hero, vote-targets) + 1 watch-grid facade poster (the filler, since no real videos are mocked).
+    expect(screen.getAllByRole("img")).toHaveLength(6);
     expect(screen.getByAltText(homeContent.portrait.alt)).toHaveAttribute(
       "src",
       expect.stringContaining("oto-native.png")
@@ -182,15 +182,15 @@ describe("Home page", () => {
     );
   });
 
-  test("features the party badge twice in the hero and once on the vote-targets plane", async () => {
+  test("features the party badge in the hero and on the vote-targets plane", async () => {
     render(await HomePage());
     const badges = screen.getAllByAltText(siteContentDefault.partyLogo.alt);
-    expect(badges).toHaveLength(3);
+    expect(badges).toHaveLength(2);
     for (const badge of badges) {
       expect(badge).toHaveAttribute("src", expect.stringContaining("zlp-logo.png"));
     }
     const hero = screen.getByRole("heading", { level: 1 }).closest("section");
-    expect(hero?.querySelectorAll('img[src*="zlp-logo"]')).toHaveLength(2);
+    expect(hero?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
     const targets = screen.getByText("1,000,000").closest("section");
     expect(targets?.querySelector('img[src*="zlp-logo"]')).not.toBeNull();
   });

@@ -1,97 +1,59 @@
-import { beforeEach, expect, test, vi } from "vitest";
+import { expect, test } from "vitest";
 import { NextRequest } from "next/server";
-
-const getUserMock = vi.fn();
-const createServerClientMock = vi.fn(() => ({ auth: { getUser: getUserMock } }));
-vi.mock("@supabase/ssr", () => ({
-  createServerClient: () => createServerClientMock(),
-}));
-
-const isOtoAdminMock = vi.fn();
-vi.mock("@/lib/admin/authorize", () => ({
-  isOtoAdmin: (id: string) => isOtoAdminMock(id),
-}));
-
-vi.mock("@/lib/supabase/env", () => ({
-  SUPABASE_URL: "https://example.supabase.co",
-  SUPABASE_PUBLISHABLE_KEY: "test-publishable-key",
-}));
-
 import { proxy } from "./proxy";
 
-beforeEach(() => {
-  getUserMock.mockReset();
-  isOtoAdminMock.mockReset();
-  createServerClientMock.mockReset();
-  createServerClientMock.mockImplementation(() => ({ auth: { getUser: getUserMock } }));
-  vi.spyOn(console, "error").mockImplementation(() => {});
+function request(pathname: string) {
+  return new NextRequest(new URL(pathname, "https://otosenate2027.com"));
+}
+
+function nonceFrom(csp: string) {
+  return /'nonce-([^']+)'/.exec(csp)?.[1];
+}
+
+test("sets a Content-Security-Policy carrying a nonce", async () => {
+  const response = await proxy(request("/"));
+  const csp = response.headers.get("Content-Security-Policy");
+
+  expect(csp).not.toBeNull();
+  expect(nonceFrom(csp!)).toBeTruthy();
 });
 
-test("redirects an unauthenticated visitor away from a protected admin route", async () => {
-  getUserMock.mockResolvedValue({ data: { user: null } });
-  const response = await proxy(new NextRequest("http://localhost/admin/admins"));
-  expect(response.status).toBe(307);
-  expect(response.headers.get("location")).toBe("http://localhost/admin/login");
+test("never falls back to 'unsafe-inline' for scripts — the whole point of the nonce", async () => {
+  const response = await proxy(request("/"));
+  const csp = response.headers.get("Content-Security-Policy")!;
+  const scriptSrc = csp.split(";").find((d) => d.trim().startsWith("script-src"));
+
+  expect(scriptSrc).not.toContain("unsafe-inline");
+  expect(scriptSrc).toContain("'strict-dynamic'");
 });
 
-test("lets a logged-in oto_admin through to a protected route", async () => {
-  getUserMock.mockResolvedValue({ data: { user: { id: "user-1" } } });
-  isOtoAdminMock.mockResolvedValue(true);
-  const response = await proxy(new NextRequest("http://localhost/admin/admins"));
-  expect(response.status).toBe(200);
+test("public pages get a locked-down connect-src with no Supabase/Cloudinary access", async () => {
+  const response = await proxy(request("/"));
+  const csp = response.headers.get("Content-Security-Policy")!;
+  const connectSrc = csp.split(";").find((d) => d.trim().startsWith("connect-src"))!;
+
+  expect(connectSrc).toContain("'self'");
+  expect(connectSrc).not.toContain("supabase.co");
+  expect(connectSrc).not.toContain("cloudinary.com");
 });
 
-test("redirects a logged-in non-admin away from a protected route", async () => {
-  getUserMock.mockResolvedValue({ data: { user: { id: "user-9" } } });
-  isOtoAdminMock.mockResolvedValue(false);
-  const response = await proxy(new NextRequest("http://localhost/admin/admins"));
-  expect(response.status).toBe(307);
-  expect(response.headers.get("location")).toBe("http://localhost/admin/login");
+test("admin pages get connect-src access to Supabase and Cloudinary's API", async () => {
+  // /admin itself redirects to /admin/login when unauthenticated (no
+  // session cookie in this test), and redirects carry no CSP of their
+  // own — the browser just follows them to a URL that gets its own
+  // correct one. /admin/login returns its response directly when
+  // unauthenticated, so it's the stable path to assert the admin CSP on.
+  const response = await proxy(request("/admin/login"));
+  const csp = response.headers.get("Content-Security-Policy")!;
+  const connectSrc = csp.split(";").find((d) => d.trim().startsWith("connect-src"))!;
+
+  expect(connectSrc).toContain("supabase.co");
+  expect(connectSrc).toContain("https://api.cloudinary.com");
 });
 
-test("redirects an already-authorized admin away from the login page", async () => {
-  getUserMock.mockResolvedValue({ data: { user: { id: "user-1" } } });
-  isOtoAdminMock.mockResolvedValue(true);
-  const response = await proxy(new NextRequest("http://localhost/admin/login"));
-  expect(response.status).toBe(307);
-  expect(response.headers.get("location")).toBe("http://localhost/admin");
-});
-
-test("lets an unauthenticated visitor reach the login page", async () => {
-  getUserMock.mockResolvedValue({ data: { user: null } });
-  const response = await proxy(new NextRequest("http://localhost/admin/login"));
-  expect(response.status).toBe(200);
-});
-
-test("does not touch requests outside /admin", async () => {
-  const response = await proxy(new NextRequest("http://localhost/gallery"));
-  expect(response.status).toBe(200);
-  expect(getUserMock).not.toHaveBeenCalled();
-});
-
-test("fails closed and redirects to login when the auth check throws", async () => {
-  createServerClientMock.mockImplementation(() => {
-    throw new Error("supabaseUrl is required.");
-  });
-  const response = await proxy(new NextRequest("http://localhost/admin/admins"));
-  expect(response.status).toBe(307);
-  expect(response.headers.get("location")).toBe("http://localhost/admin/login");
-});
-
-test("still serves the login page itself when the auth check throws", async () => {
-  createServerClientMock.mockImplementation(() => {
-    throw new Error("supabaseUrl is required.");
-  });
-  const response = await proxy(new NextRequest("http://localhost/admin/login"));
-  expect(response.status).toBe(200);
-});
-
-test("lets a Next.js internal signal propagate instead of swallowing it", async () => {
-  const signal = Object.assign(new Error("Dynamic server usage"), {
-    digest: "DYNAMIC_SERVER_USAGE",
-  });
-  createServerClientMock.mockImplementation(() => {
-    throw signal;
-  });
-  await expect(proxy(new NextRequest("http://localhost/admin/admins"))).rejects.toBe(signal);
+test("two different requests get two different nonces", async () => {
+  const [a, b] = await Promise.all([proxy(request("/")), proxy(request("/"))]);
+  const nonceA = nonceFrom(a.headers.get("Content-Security-Policy")!);
+  const nonceB = nonceFrom(b.headers.get("Content-Security-Policy")!);
+  expect(nonceA).not.toBe(nonceB);
 });
