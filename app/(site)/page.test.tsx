@@ -297,4 +297,11 @@ describe("Home page", () => {
       screen.getByText(/from this target there is enough to win it/)
     ).toBeInTheDocument();
   });
+
+  test("hands off to the posters page after the get-involved ask", async () => {
+    render(await HomePage());
+    expect(
+      screen.getByRole("link", { name: "Get the posters" })
+    ).toHaveAttribute("href", "/work-with-us");
+  });
 });

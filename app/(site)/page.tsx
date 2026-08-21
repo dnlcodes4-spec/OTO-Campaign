@@ -8,6 +8,7 @@ import { PledgeGrid } from "@/components/sections/PledgeGrid";
 import { SenatorJob } from "@/components/sections/SenatorJob";
 import { WatchBlock } from "@/components/sections/WatchBlock";
 import { GetInvolvedBlock } from "@/components/sections/GetInvolvedBlock";
+import { PostersTeaser } from "@/components/sections/PostersTeaser";
 import { VoteTargets } from "@/components/sections/VoteTargets";
 import { getHomeContent } from "@/content/home";
 import { getSiteContentData } from "@/content/site";
@@ -169,6 +170,19 @@ export default async function HomePage() {
           image={getInvolvedContent.image}
           asks={getInvolvedContent.asks}
         />
+      </Section>
+      {/*
+       * Its own plane, not nested inside get-involved's Section: that
+       * Section's closing image panel bleeds past its own bottom edge on
+       * negative margin (see GetInvolvedBlock), sized to dissolve into the
+       * PlaneCut immediately below it. Anything appended inside that same
+       * Section would sit in the bled image's path. Same green tone as
+       * get-involved, so no PlaneCut is needed between them — the bleed
+       * dissolves into this plane's own top padding instead, and the
+       * existing green-to-ink cut simply moves to sit after this plane.
+       */}
+      <Section tone="green">
+        <PostersTeaser />
       </Section>
       <PlaneCut from="green" to="ink" />
       <Section tone="ink">

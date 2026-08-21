@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/#agenda", label: "Agenda" },
   { href: "/#get-involved", label: "Get Involved" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/work-with-us", label: "Work With Us" },
 ];
 
 /*

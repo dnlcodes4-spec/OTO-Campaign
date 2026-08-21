@@ -76,6 +76,10 @@ describe("Nav", () => {
       "/#get-involved"
     );
     expect(screen.getByRole("link", { name: "Gallery" })).toHaveAttribute("href", "/gallery");
+    expect(screen.getByRole("link", { name: "Work With Us" })).toHaveAttribute(
+      "href",
+      "/work-with-us"
+    );
   });
 
   test("mobile menu opens as its own layer, locks scroll, and closes", () => {
